@@ -10,11 +10,12 @@ namespace EEM.Common.Protocol
     public PlayerResponseG g { get; set; } // Unknown
     public PlayerResponseM m { get; set; } // Unknown
     public int d { get; set; } // Unknown
-    public int t { get; set; } // Unknown
-    public int p { get; set; } // Unknown
-    public int r { get; set; } // Unknown
+    public int t { get; set; } // Title
+    public int p { get; set; } // Points
+    public int r { get; set; } // Rank
     public int ms { get; set; } // Unknown
     public int b { get; set; } // Unknown
+    public int bc { get; set; } // Unknown
     public int bi { get; set; } // Unknown
     public int bq { get; set; } // Unknown
     public int bqs { get; set; } // Unknown
@@ -28,9 +29,12 @@ namespace EEM.Common.Protocol
     public int mme { get; set; } // Unknown
     public bool mtp { get; set; } // Unknown
     public int mte { get; set; } // Unknown
-    public List<CityResponse> c { get; set; } //  Cities
+    public List<CityResponseToBeFixed> c { get; set; } //  Cities
     public object pt { get; set; } // Unknown
+    public object vr { get; set; } // Recourses "vr":[[8,36025],[7,42593],[6,19243],[5,129941]],
     public object os { get; set; } // Unknown
+    public object tt { get; set; } // Unknown
+    public object mo { get; set; } // Unknown
     // ReSharper restore InconsistentNaming
   }
 }
