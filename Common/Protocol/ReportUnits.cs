@@ -16,7 +16,7 @@
       get { return o; }
     }
 
-    public MilitaryUnitType UnitType
+    public MilitaryUnits Units
     {
       get { return ConversionUtil.ConvertMilitaryUnit(t); }
     }

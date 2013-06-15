@@ -9,7 +9,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Server" Type="System.String" Scope="User">
-      <Value Profile="(Default)">http://prodgame01.lordofultima.com/7</Value>
+      <Value Profile="(Default)">http://prodgame12.lordofultima.com/21</Value>
     </Setting>
     <Setting Name="LoUUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">http://www.lordofultima.com/en/</Value>
@@ -18,6 +18,12 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ConnectOnStartup" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ApplicationVersion" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1.1</Value>
+    </Setting>
+    <Setting Name="MinimizeToSystemTray" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using EEM.Common;
 
 namespace EEM.Plugin.Chat
 {
@@ -42,6 +43,7 @@ namespace EEM.Plugin.Chat
       checkBoxOpenOnStart.Checked = Properties.Settings.Default.OpenChatWindowOnStartUp;
       checkBoxEnableLogging.Checked = Properties.Settings.Default.EnableLogging;
       textBoxLogFile.Text = Properties.Settings.Default.ChatLogFile;
+      comboBoxLogFormat.SelectedIndex = ConvertChatLogFormat(Properties.Settings.Default.ChatLogFormat);
 
     }
 
@@ -110,6 +112,7 @@ namespace EEM.Plugin.Chat
       Properties.Settings.Default.OpenChatWindowOnStartUp = checkBoxOpenOnStart.Checked;
       Properties.Settings.Default.EnableLogging = checkBoxEnableLogging.Checked;
       Properties.Settings.Default.ChatLogFile = textBoxLogFile.Text;
+      Properties.Settings.Default.ChatLogFormat = ConvertChatLogFormat(comboBoxLogFormat.SelectedIndex).ToString();
 
       // Save and Reload
       Properties.Settings.Default.Save();
@@ -137,6 +140,44 @@ namespace EEM.Plugin.Chat
       if (!e.Cancel)
       {
         textBoxLogFile.Text = saveLogFileDialog.FileName;
+      }
+    }
+
+    private static int ConvertChatLogFormat (string format)
+    {
+      if (format == "Apache Style") format = "ApacheStyle";
+
+      var stringToEnum = (ChatLogFormat) ConversionUtil.StringToEnum(typeof(ChatLogFormat), format);
+      return ConvertChatLogFormat(stringToEnum);
+    }
+
+    private static int ConvertChatLogFormat (ChatLogFormat format)
+    {
+      switch (format)
+      {
+        case ChatLogFormat.ApacheStyle:
+          return 0;
+
+        case ChatLogFormat.CSV:
+          return 1;
+
+        default:
+          return 0;
+      }      
+    }
+
+    private static ChatLogFormat ConvertChatLogFormat(int index)
+    {
+      switch (index)
+      {
+        case 0:
+          return ChatLogFormat.ApacheStyle;
+
+        case 1:
+          return ChatLogFormat.CSV;
+
+        default:
+          return ChatLogFormat.ApacheStyle;
       }
     }
   }

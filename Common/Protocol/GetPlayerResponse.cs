@@ -6,7 +6,7 @@ namespace EEM.Common.Protocol
   {
     public int AllianceId { get; set; }
     public string AllianceName { get; set; }
-    public List<CityResponse> Cities { get; set; }
+    public List<CityResponseToBeFixed> Cities { get; set; }
     public int Id { get; set; }
     public string Name { get; set; }
   }

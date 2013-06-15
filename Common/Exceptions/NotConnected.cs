@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EEM.Common.Adapters
+namespace EEM.Common.Exceptions
 {
   public class NotConnected : Exception
   {

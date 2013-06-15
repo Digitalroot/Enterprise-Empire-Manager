@@ -32,6 +32,7 @@
       this.textBoxGameServer = new System.Windows.Forms.TextBox();
       this.buttonSave = new System.Windows.Forms.Button();
       this.checkBoxConnectOnStartUp = new System.Windows.Forms.CheckBox();
+      this.checkBoxMinToSysTray = new System.Windows.Forms.CheckBox();
       this.SuspendLayout();
       // 
       // label1
@@ -53,7 +54,7 @@
       // 
       // buttonSave
       // 
-      this.buttonSave.Location = new System.Drawing.Point(279, 56);
+      this.buttonSave.Location = new System.Drawing.Point(279, 79);
       this.buttonSave.Name = "buttonSave";
       this.buttonSave.Size = new System.Drawing.Size(75, 23);
       this.buttonSave.TabIndex = 4;
@@ -71,12 +72,23 @@
       this.checkBoxConnectOnStartUp.Text = "Connect on Startup";
       this.checkBoxConnectOnStartUp.UseVisualStyleBackColor = true;
       // 
+      // checkBoxMinToSysTray
+      // 
+      this.checkBoxMinToSysTray.AutoSize = true;
+      this.checkBoxMinToSysTray.Location = new System.Drawing.Point(16, 79);
+      this.checkBoxMinToSysTray.Name = "checkBoxMinToSysTray";
+      this.checkBoxMinToSysTray.Size = new System.Drawing.Size(139, 17);
+      this.checkBoxMinToSysTray.TabIndex = 6;
+      this.checkBoxMinToSysTray.Text = "Minimize to System Tray";
+      this.checkBoxMinToSysTray.UseVisualStyleBackColor = true;
+      // 
       // OptionsScreen
       // 
       this.AcceptButton = this.buttonSave;
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(375, 90);
+      this.ClientSize = new System.Drawing.Size(375, 111);
+      this.Controls.Add(this.checkBoxMinToSysTray);
       this.Controls.Add(this.checkBoxConnectOnStartUp);
       this.Controls.Add(this.buttonSave);
       this.Controls.Add(this.textBoxGameServer);
@@ -101,5 +113,6 @@
     private System.Windows.Forms.TextBox textBoxGameServer;
     private System.Windows.Forms.Button buttonSave;
     private System.Windows.Forms.CheckBox checkBoxConnectOnStartUp;
+    private System.Windows.Forms.CheckBox checkBoxMinToSysTray;
   }
 }

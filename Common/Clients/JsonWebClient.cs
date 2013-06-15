@@ -13,7 +13,7 @@ namespace EEM.Common.Clients
   /// Cookie Aware and has been customized for querying 
   /// the LoU Game Servers. 
   /// </summary>
-  internal class  JsonWebClient : CookieAwareWebClient
+  public class JsonWebClient : CookieAwareWebClient
   {
     private readonly string _cookiePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + "EnterpriseEmpireManager";
     private readonly string _cookieFile;

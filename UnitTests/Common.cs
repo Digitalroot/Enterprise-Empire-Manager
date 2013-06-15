@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.IO;
+using EEM.Common.Protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
@@ -11,7 +12,9 @@ namespace EEM.UnitTests
     [TestMethod]
     public void Test()
     {
-
+      StreamReader reader = new StreamReader("C:\\Users\\\\Documents\\Visual Studio 2010\\Projects\\EEM\\Enterprise Empire Manager\\bin\\x86\\Debug\\json.txt");
+      string json = reader.ReadToEnd();
+      var x = JsonConvert.DeserializeObject<CityResponse>(json);
     }
 
   }

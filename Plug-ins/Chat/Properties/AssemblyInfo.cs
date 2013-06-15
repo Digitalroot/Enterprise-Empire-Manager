@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Digitalroot")]
 [assembly: AssemblyProduct("EEM Chat Plug-in is a DotNet application written by Digitalroot and is being released as a project of php|uber.leet")]
-[assembly: AssemblyCopyright("Copyright © php|uber.leet 2010")]
+[assembly: AssemblyCopyright("Copyright © php|uber.leet 2011")]
 [assembly: AssemblyTrademark("Lords of Ultma is a Trademark of Electronic Arts Inc. All Rights Reserved")]
 [assembly: AssemblyCulture("")]
 

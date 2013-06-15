@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using EEM.Common.Protocol;
 using Newtonsoft.Json;
 
@@ -143,6 +145,34 @@ namespace EEM.Common.Adapters
       return result;
     }
 
+    public CityResponse GetCityDetails(int cityId)
+    {
+      var json = new JsonRequest(new
+      {
+        session = SessionId,
+        requestid = ++RequestCount,
+        requests = String.Format("CITY:{0}\f", cityId)
+      });
+
+      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.Poll, json);
+      var jsonArray = JsonConvert.DeserializeObject<ArrayList>(result);
+      CityResponse cityResponse = null;
+
+      if (jsonArray != null)
+      {
+        foreach (var response in jsonArray)
+        {
+          var deserializeObject = JsonConvert.DeserializeObject<PollResponse<object>>(response.ToString());
+          if (deserializeObject.C == "CITY")
+          {
+            cityResponse = JsonConvert.DeserializeObject<CityResponse>(response.ToString());
+          }
+        }
+      }
+
+      return cityResponse;
+    }
+
     /// <summary>
     /// Gets the distance from the current city to the target city.
     /// </summary>
@@ -186,7 +216,7 @@ namespace EEM.Common.Adapters
     /// <param name="xcord"></param>
     /// <param name="ycord"></param>
     /// <returns></returns>
-    public string GetOrderTargetInfo(string cityId, string xcord, string ycord)
+    public GetOrderTargetInfoResponse GetOrderTargetInfo(int cityId, string xcord, string ycord)
     {
       var json = new JsonRequest(new
                                    {
@@ -197,7 +227,7 @@ namespace EEM.Common.Adapters
                                    });
 
       var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetOrderTargetInfo, json);
-      return result;
+      return JsonConvert.DeserializeObject<GetOrderTargetInfoResponse>(result);
     }
 
     /// <summary>
@@ -213,6 +243,56 @@ namespace EEM.Common.Adapters
 
       var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetPlayerInfo, json);
       return JsonConvert.DeserializeObject<GetPlayerResponse>(result);
+    }
+
+    /// <summary>
+    /// Gets info about a city. 
+    /// </summary>
+    /// <param name="cityId"></param>
+    /// <returns></returns>
+    public GetPublicCityInfoResponse GetPublicCityInfo(int cityId)
+    {
+      var json = new JsonRequest(new
+      {
+        session = SessionId,
+        id = cityId,
+      });
+
+      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetPublicCityInfo, json);
+      return JsonConvert.DeserializeObject<GetPublicCityInfoResponse>(result);      
+    }
+
+    /// <summary>
+    /// Gets info about a city. 
+    /// </summary>
+    /// <param name="cityId"></param>
+    /// <returns></returns>
+    public int QueueGetPublicCityInfo(int cityId)
+    {
+      var json = new JsonRequest(new
+      {
+        session = SessionId,
+        id = cityId,
+      });
+
+      return MessageExchangeAdapter.QueueServerCommand(ServerCommand.GetPublicCityInfo, json);
+    }
+
+    /// <summary>
+    /// Gets info about a player. 
+    /// </summary>
+    /// <param name="playerId"></param>
+    /// <returns></returns>
+    public GetPublicPlayerInfoResponse GetPublicPlayerInfo(int playerId)
+    {
+      var json = new JsonRequest(new
+      {
+        session = SessionId,
+        id = playerId,
+      });
+
+      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetPublicPlayerInfo, json);
+      return JsonConvert.DeserializeObject<GetPublicPlayerInfoResponse>(result);
     }
 
     /// <summary>
@@ -320,6 +400,93 @@ namespace EEM.Common.Adapters
     }
 
     /// <summary>
+    /// Resets and Opens a session.
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <returns></returns>
+    public OpenSessionResponse OpenSession(string sessionId)
+    {
+      var json = new JsonRequest(new
+      {
+        session = SessionId,
+        reset = true
+      });
+
+      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.OpenSession, json);
+      return JsonConvert.DeserializeObject<OpenSessionResponse>(result); ;
+    }
+
+    /// <summary>
+    /// Orders Units.
+    /// </summary>
+    /// <param name="cityId"></param>
+    /// <param name="unitTypeAndCount"></param>
+    /// <param name="cords"></param>
+    /// <param name="attackType"></param>
+    /// <param name="whenToSend"></param>
+    /// <param name="sendNow"></param>
+    /// <returns></returns>
+    public string OrdersUnit(int cityId, Units[] unitTypeAndCount, string cords, AttackType attackType, DateTime? whenToSend)
+    {
+      // {"session":"00000000-a4ee-42d4-b827-2bd438764ffa","cityid":"20971776","units":[{"t":"10","c":2748}],"targetPlayer":"Dienekes","targetCity":"254:321","order":4,"transport":1,"timeReferenceType":1,"referenceTimeUTCMillis":0}
+
+      // Remove all the null values. ToDo: Clean this up.
+      int counter = unitTypeAndCount.Count(unitTandC => unitTandC != null);
+      Units[] cleanUnitTypeAndCount = new Units[counter];
+      int transportType = 1;
+
+      counter = 0;
+      foreach (Units unitse in unitTypeAndCount)
+      {
+        if (unitse != null)
+        {
+          cleanUnitTypeAndCount[counter++] = unitse;
+
+          // If a ship is in the order send by ship. 
+          if (unitse.t == MilitaryUnits.WarGalleon || unitse.t == MilitaryUnits.Sloop || unitse.t == MilitaryUnits.Frigate)
+          {
+            transportType = 2;
+          }
+        }
+      }
+
+      int timeReferenceTypeValue = 0;
+      double referenceTimeUTCMillisValue = 0;
+
+      if (whenToSend == null)
+      {
+        timeReferenceTypeValue = 1;
+        referenceTimeUTCMillisValue = 0;
+      }
+      else
+      {
+        timeReferenceTypeValue = 3;
+        var tempDateTime = (DateTime) whenToSend;
+        referenceTimeUTCMillisValue = (int) ConversionUtil.ConvertToUnixTimestamp(tempDateTime.AddHours(TimeService.ServerTimeZoneOffset * -1));
+      }
+
+      string[] cordxy = cords.Split(Convert.ToChar(":"));
+
+      var json = new JsonRequest(new
+      {
+        session = SessionId,
+        cityid = cityId,
+        units = cleanUnitTypeAndCount,
+        targetPlayer = GetOrderTargetInfo(cityId, cordxy[0], cordxy[1]).PlayerName,
+        targetCity = cords,
+        order = attackType,
+        transport = transportType,
+        timeReferenceType = timeReferenceTypeValue, // 1 = Now, 2 = Departure Time, 3 = Arrival Time
+        referenceTimeUTCMillis = referenceTimeUTCMillisValue + "500",
+        raidTimeReferenceType = 0,
+        raidReferenceTimeUTCMillis = 0
+      });
+
+      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.OrderUnits, json);
+      return result;
+    }
+
+    /// <summary>
     /// Renames a City
     /// </summary>
     /// <remarks>Use this to rename a cityId.</remarks>
@@ -352,8 +519,107 @@ namespace EEM.Common.Adapters
                                      requestid = ++RequestCount, 
                                      requests = String.Format("CHAT:{0}\f", message)
                                    });
-      _listOfPollIds.Add(MessageExchangeAdapter.QueueServerCommand(ServerCommand.Poll, json));
-     
+
+      PollingService.ListOfPollIds.Add(MessageExchangeAdapter.QueueServerCommand(ServerCommand.Poll, json));
+    }
+
+    /// <summary>
+    /// Send an In Game Mail
+    /// </summary>
+    /// <param name="to">Who to send the mail to.</param>
+    /// <param name="subjectLine">Subject</param>
+    /// <param name="bodytext">Body</param>
+    /// <returns></returns>
+    public bool SendMail(string to, string subjectLine, string bodytext)
+    {
+      var json = new JsonRequest(new
+      {
+        session = SessionId,
+        target = to,
+        subject = subjectLine,
+        body = bodytext
+      });
+
+      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.IGMSendMsg, json);
+      return result == "true";
+    }
+
+    /// <summary>
+    /// Send an In Game Mail to more then one person.
+    /// </summary>
+    /// <param name="toList">Who to send the mail to.</param>
+    /// <param name="subjectLine">Subject</param>
+    /// <param name="bodytext">Body</param>
+    /// <returns>An Array of results. Index matches the toList index. If the value = 0 then the mail worked without error.</returns>
+    public List<string> SendBulkMail(List<string> toList, string subjectLine, string bodytext)
+    {
+      var to = new StringBuilder();
+      foreach (string name in toList)
+      {
+        to.Append(name).Append("; ");
+      }
+
+      var json = new JsonRequest(new
+      {
+        session = SessionId,
+        targets = to.ToString().TrimEnd(' ').TrimEnd(';'),
+        subject = subjectLine,
+        body = bodytext
+      });
+
+      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.IGMBulkSendMsg, json);
+      return JsonConvert.DeserializeObject<List<string>>(result);
+    }
+
+    public List<GetPublicAllianceMemberListResponse> GetPublicAllianceMemberList(int allianceId)
+    {
+      var json = new JsonRequest(new
+      {
+        session = SessionId,
+        id = allianceId
+      });
+
+
+      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetPublicAllianceMemberList, json);
+      return JsonConvert.DeserializeObject<List<GetPublicAllianceMemberListResponse>>(result);
+    }
+
+    /// <summary>
+    /// ToDo: change this to first request the total number of alliance on a server and then use that as the end value.
+    /// </summary>
+    /// <returns></returns>
+    public List<AllianceGetRangeResponse> GetListOfAlliances()
+    {
+
+      int numberOfAlliances = AllianceGetCountAndIndex();
+
+      var json = new JsonRequest(new {
+                                       session = SessionId,
+                                       start = 0,
+                                       end = --numberOfAlliances,
+                                       continent = -1,
+                                       sort = 0,
+                                       ascending = true
+                                     });
+
+      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.AllianceGetRange, json);
+      return JsonConvert.DeserializeObject<List<AllianceGetRangeResponse>>(result);
+    }
+
+    public int AllianceGetCountAndIndex()
+    {
+      var json = new JsonRequest(new {
+                                       session = SessionId,
+                                       continent = -1,
+                                       sort = 0,
+                                       ascending = true
+                                     });
+      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.AllianceGetCountAndIndex, json); // [3126,0]
+      result = result.TrimStart('[').TrimEnd(']');
+      string[] split = result.Split(',');
+
+
+      return Int32.Parse(split[0]);
     }
 
     /// <summary>

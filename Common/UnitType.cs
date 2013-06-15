@@ -1,26 +1,24 @@
 ﻿namespace EEM.Common
 {
-  public enum MilitaryUnitType
+  public enum MilitaryUnits
   {
+    Unknown,
+    CityGuard,
+    Ballista,
     Ranger,
     Guardian,
-    Zerker,
-    Ram,
-    Pally,
-    Knight,
     Templar,
-    CityGuard,
-    Dragon,
-    Ballista,
     Berserker,
     Mage,
     Scout,
     Crossbowman,
     Paladin,
-    WarGalleon,
-    Warlock,
+    Knight,
+    Warlock, 
+    Ram,
     Catapult,
     Frigate,
-    Sloop
+    Sloop,
+    WarGalleon,
   }
 }

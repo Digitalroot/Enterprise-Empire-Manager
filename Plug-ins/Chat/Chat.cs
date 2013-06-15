@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using EEM.Common;
 using EEM.Common.PluginInterface;
 using EEM.Plugin.Chat.Properties;
+using Resources = EEM.Plugin.Chat.Properties.Resources;
 
 namespace EEM.Plugin.Chat
 {
@@ -170,6 +171,8 @@ namespace EEM.Plugin.Chat
       Author = AssemblyCompany;
       Description = AssemblyDescription;
 
+      CheckVersion();
+
       _chatViewMenuItem.ImageTransparentColor = System.Drawing.Color.Black;
       _chatViewMenuItem.Name = "chatviewMenuItem";
       _chatViewMenuItem.ShowShortcutKeys = false;
@@ -184,6 +187,23 @@ namespace EEM.Plugin.Chat
       _chatToolsMenuItem.Text = Resources.Chat_Chat_Chat_Options;
       _chatToolsMenuItem.Click += chatToolsMenuItem_Click;
 
+    }
+
+    /// <summary>
+    /// Loads settings from old config file if this is a new version.
+    /// </summary>
+    private static void CheckVersion()
+    {
+      var a = Assembly.GetExecutingAssembly();
+      var appVersion = a.GetName().Version;
+      var appVersionString = appVersion.ToString();
+      if (Settings.Default.ApplicationVersion != appVersion.ToString())
+      {
+        Settings.Default.Upgrade();
+        Settings.Default.ApplicationVersion = appVersionString;
+        Settings.Default.Save();
+        Settings.Default.Reload();
+      }
     }
 
     // ReSharper disable InconsistentNaming

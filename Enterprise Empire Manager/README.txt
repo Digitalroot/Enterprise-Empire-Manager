@@ -1,0 +1,1 @@
+Enterprise Empire Manager is released under the GNU General Public License version 2 (GPLv2).

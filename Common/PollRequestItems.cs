@@ -1,4 +1,4 @@
-﻿namespace EEM.Common.Adapters
+﻿namespace EEM.Common
 {
   public enum PollRequestItems
   {

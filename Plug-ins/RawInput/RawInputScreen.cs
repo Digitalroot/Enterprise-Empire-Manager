@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using EEM.Common.Adapters;
+using EEM.Common.Exceptions;
 using EEM.Common.PluginInterface;
 
 namespace EEM.Plugin.RawInput

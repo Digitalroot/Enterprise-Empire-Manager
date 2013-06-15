@@ -16,7 +16,7 @@ namespace EEM.Common.Adapters
   /// <summary>
   /// This is the piece that exchanges messages with the LoU Servers
   /// </summary>
-  internal sealed class MessageExchangeAdapter
+  public sealed class MessageExchangeAdapter
   {
     /// <summary>
     /// Background worker thread.
@@ -86,6 +86,11 @@ namespace EEM.Common.Adapters
     /// Lock to make thread safe
     /// </summary>
     private static readonly object SyncRoot = new Object();
+
+    /// <summary>
+    /// Lock to make thread safe.
+    /// </summary>
+    public static readonly object SyncBackGroundWorker = new Object();
 
     #region Events
 
@@ -207,12 +212,12 @@ namespace EEM.Common.Adapters
     /// <param name="e"></param>
     void BackgroundWorkerDoWork(object sender, DoWorkEventArgs e)
     {
-      var command = _queuedCommands.Dequeue();
-      if (command != null)
-      {
-        var result = ExecuteServerCommand(command.Command, command.JsonRequest, true);
-        e.Result = new QueuedResult(result, command.Id);
-      }
+        var command = _queuedCommands.Dequeue();
+        if (command != null)
+        {
+          var result = ExecuteServerCommand(command.Command, command.JsonRequest, true);
+          e.Result = new QueuedResult(result, command.Id);
+        }
     }
 
     /// <summary>
@@ -227,6 +232,12 @@ namespace EEM.Common.Adapters
       var results = e.Result as QueuedResult;
       
       if (results != null) ServerRespondedToQueuedCommand(results.Id, results.Result);
+
+      if (_queuedCommands.Count > 0 && !_backgroundWorker.IsBusy)
+      {
+        _backgroundWorker.RunWorkerAsync();
+        Thread.Sleep(1000);
+      }
     }
 
     /// <summary>
@@ -302,9 +313,12 @@ namespace EEM.Common.Adapters
       _queuedCommandsIdCounter++;
       _queuedCommands.Enqueue(new QueuedCommand(json, command, id));
 
-      if (!_backgroundWorker.IsBusy && _queuedCommands.Count > 0)
+      lock (SyncBackGroundWorker)
       {
-        _backgroundWorker.RunWorkerAsync();
+        if (!_backgroundWorker.IsBusy && _queuedCommands.Count > 0)
+        {
+          _backgroundWorker.RunWorkerAsync();
+        }
       }
       return id;
     }
@@ -318,12 +332,11 @@ namespace EEM.Common.Adapters
     void queuetimer_Tick(object sender, EventArgs e)
     // ReSharper restore InconsistentNaming
     {
-      if (!_backgroundWorker.IsBusy && _queuedCommands.Count > 0)
+      lock (SyncBackGroundWorker)
       {
-        while (_queuedCommands.Count != 0)
+        if (!_backgroundWorker.IsBusy && _queuedCommands.Count > 0)
         {
-          _backgroundWorker.RunWorkerAsync();
-          Thread.Sleep(3500);
+          _backgroundWorker.RunWorkerAsync();              
         }
       }
     }

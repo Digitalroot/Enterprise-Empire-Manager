@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Windows.Forms;
 using EEM.Common.Protocol;
 using Newtonsoft.Json;
 
@@ -21,9 +22,10 @@ namespace EEM.Common.Adapters
     /// </summary>
     /// <param name="url"></param>
     /// <param name="json"></param>
-    static void MessageExchangeAdapter_OnServerRequest(string url, JsonRequest json)
+    void MessageExchangeAdapter_OnServerRequest(string url, JsonRequest json)
     {
       System.Diagnostics.Debug.WriteLine(String.Format("MessageExchangeClient.OnServerRequest: {0}, URL: {1}", json, url));
+      ServerRequestMade(url, json);
     }
 
     /// <summary>
@@ -45,9 +47,9 @@ namespace EEM.Common.Adapters
     {
       System.Diagnostics.Debug.WriteLine(String.Format("MessageExchangeClient.OnServerResponseToQueuedCommand, Id: {0}, Result: {1}", id, result));
 
-      if (_listOfPollIds.Contains(id))
+      if (PollingService.ListOfPollIds.Contains(id))
       {
-        _listOfPollIds.Remove(id);
+        PollingService.ListOfPollIds.Remove(id);
         ArrayList jsonArray = null;
         try
         {
@@ -84,61 +86,52 @@ namespace EEM.Common.Adapters
     void polltimer_Tick(object sender, EventArgs e)
     // ReSharper restore InconsistentNaming
     {
-      if (ConnectionState != ConnectionState.Connected || _pollRequestItems.Count == 0)
+      if (PollingService.ListOfPollIds.Count >= 2) return; // Only add a request if we are not already waiting.
+
+      if (CurrentCity == null && Cities.Count > 0)
       {
-        StopPollTimer();
-        return;
+        CurrentCity = Cities[0];
       }
 
-      JsonRequest json;
-      if (RequestCount == 0)
+      if (CurrentCity == null)
       {
-        // {"session":"0000000-6ac8-4623-b814-2efcb086a86d","requestid":"3837","requests":"CAT:1\fSERVER:\fALLIANCE:\fQUEST:\fPLAYER:\fCITY:15204670\fVIS:c:15204670:0:-874:-411:1196:1018\fREPORT:\fMAIL:\fFRIENDINV:\fALL_AT:\fCHAT:\fTIME:1285834121258\fSUBSTITUTION:\fINV:\fRESO:\f"}
-        var requestitems = new Hashtable();
-        requestitems.Add("CAT", "0");
-        requestitems.Add("SERVER", String.Empty);
-        requestitems.Add("ALLIANCE", String.Empty);
-        requestitems.Add("QUEST", String.Empty);
-        requestitems.Add("PLAYER", "0");
-        requestitems.Add("CITY", CurrentCity.Id);
-        requestitems.Add("VIS", String.Format("c:{0}:0:-874:-412:1196:1016", CurrentCity.Id));
-        requestitems.Add("REPORT", String.Empty);
-        requestitems.Add("MAIL", String.Empty);
-        requestitems.Add("FRIENDINV", String.Empty);
-        requestitems.Add("ALL_AT", String.Empty);
-        requestitems.Add("TIME", "1285834121258");
-        requestitems.Add("SUBSTITUTION", String.Empty);
-        requestitems.Add("INV", String.Empty);
-        
-        foreach (string item in _pollRequestItems.Keys)
-        {
-          if (requestitems.ContainsKey(item))
-          {
-            requestitems[item] = _pollRequestItems[item];
-          }
-          else
-          {
-            requestitems.Add(item, _pollRequestItems[item]);
-          }
-        }
+        return;
+      }
+      
+      RequestCount++;
 
-        json = Poll.Request(
-                            SessionId,
-                            ++RequestCount,
-                            requestitems
-                           );
+      JsonRequest json;
+      if (RequestCount == 1)
+      {
+        json = PollingService.GetFirstPollRequest(CurrentCity, SessionId);
       }
       else
       {
-        json = Poll.Request(
-                            SessionId,
-                            ++RequestCount,
-                            _pollRequestItems
-                           );
+        json = PollingService.GetPollRequest(CurrentCity, SessionId, RequestCount);        
       }
-      
+
       var id = MessageExchangeAdapter.QueueServerCommand(ServerCommand.Poll, json);
-      _listOfPollIds.Add(id);
+      PollingService.ListOfPollIds.Add(id);
+    }
+
+    /// <summary>
+    /// Handles System Commands.
+    /// </summary>
+    /// <param name="response"></param>
+    private void LoUAdapter_OnSystemResponse(SysResponse response)
+    {
+      switch (response.Command)
+      {
+        case "CLOSED":
+          Disconnect();
+          break;
+
+        case "KICKED":
+          Disconnect();
+          MessageBox.Show("You have been kicked from the server.", "Kicked", MessageBoxButtons.OK,
+                          MessageBoxIcon.Exclamation);
+          break;
+      }
     }
   }
 }

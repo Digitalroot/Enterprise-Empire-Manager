@@ -5,9 +5,9 @@
     public int t { get; private set; }
     public int c { get; private set; }
 
-    public TradeResource(ResourceType resourceType, int ammount)
+    public TradeResource(Resources resources, int ammount)
     {
-      t = ConversionUtil.ConvertResource(resourceType);
+      t = ConversionUtil.ConvertResource(resources);
       c = ammount;
     }
   }

@@ -49,7 +49,7 @@ namespace EEM.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://prodgame01.lordofultima.com/7")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://prodgame12.lordofultima.com/21")]
         public string Server {
             get {
                 return ((string)(this["Server"]));
@@ -89,6 +89,30 @@ namespace EEM.Properties {
             }
             set {
                 this["ConnectOnStartup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.1")]
+        public string ApplicationVersion {
+            get {
+                return ((string)(this["ApplicationVersion"]));
+            }
+            set {
+                this["ApplicationVersion"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool MinimizeToSystemTray {
+            get {
+                return ((bool)(this["MinimizeToSystemTray"]));
+            }
+            set {
+                this["MinimizeToSystemTray"] = value;
             }
         }
     }

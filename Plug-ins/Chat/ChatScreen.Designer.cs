@@ -208,7 +208,9 @@
       this.Name = "ChatScreen";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
       this.Text = "LoU Chat";
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChatScreenFormClosing);
       this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainScreen_FormClosed);
+      this.Load += new System.EventHandler(this.ChatScreenLoad);
       this.tableLayoutPanel1.ResumeLayout(false);
       this.tableLayoutPanel2.ResumeLayout(false);
       this.tableLayoutPanel2.PerformLayout();

@@ -2,11 +2,12 @@
 {
   public enum AttackType
   {
+    Unknown,
     Scout,
     Plunder,
     Assault,
-    Siege,
     Support,
+    Siege,
     Raid,
     Settle,
   }

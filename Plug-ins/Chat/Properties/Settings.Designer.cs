@@ -142,5 +142,29 @@ namespace EEM.Plugin.Chat.Properties {
                 this["ChatLogFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ApacheStyle")]
+        public string ChatLogFormat {
+            get {
+                return ((string)(this["ChatLogFormat"]));
+            }
+            set {
+                this["ChatLogFormat"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.1")]
+        public string ApplicationVersion {
+            get {
+                return ((string)(this["ApplicationVersion"]));
+            }
+            set {
+                this["ApplicationVersion"] = value;
+            }
+        }
     }
 }

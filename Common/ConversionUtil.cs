@@ -5,10 +5,25 @@ namespace EEM.Common
   public static class ConversionUtil
   {
 
+    public static object StringToEnum( Type t, string value )
+    {
+      foreach ( var fi in t.GetFields() )
+        if ( fi.Name == value )
+          return fi.GetValue( null );    // We use null because
+                                         // enumeration values
+                                         // are static
+
+      throw new Exception( string.Format("Can't convert {0} to {1}", value, t) );
+    }
+
+
     public static AttackType ConvertAttackType(int attackId)
     {
       switch (attackId)
       {
+        case 0:
+          return AttackType.Unknown;
+
         case 1:
           return AttackType.Scout;
 
@@ -29,6 +44,39 @@ namespace EEM.Common
 
         case 100:
           return AttackType.Settle;
+
+        default:
+          throw new Exception("INVALID_AttackType");
+      }
+    }
+
+    public static int ConvertAttackType(AttackType attackType)
+    {
+      switch (attackType)
+      {
+        case AttackType.Unknown:
+          return 0;
+
+        case AttackType.Scout:
+          return 1;
+
+        case AttackType.Plunder:
+          return 2;
+
+        case AttackType.Assault:
+          return 3;
+
+        case AttackType.Support:
+          return 4;
+
+        case AttackType.Siege:
+          return 5;
+
+        case AttackType.Raid:
+          return 8;
+
+        case AttackType.Settle:
+          return 100;
 
         default:
           throw new Exception("INVALID_AttackType");
@@ -118,54 +166,74 @@ namespace EEM.Common
     /// </summary>
     /// <param name="resourceId"></param>
     /// <returns></returns>
-    public static ResourceType ConvertResource(int resourceId)
+    [Obsolete("Use the enum values for Resources.")]
+    public static Resources ConvertResource(int resourceId)
     {
       switch (resourceId)
       {
         case 0:
-          return ResourceType.Gold;
+          return Resources.Gold;
 
         case 1:
-          return ResourceType.Wood;
+          return Resources.Wood;
 
         case 2:
-          return ResourceType.Stone;
+          return Resources.Stone;
 
         case 3:
-          return ResourceType.Iron;
+          return Resources.Iron;
 
         case 4:
-          return ResourceType.Food;
+          return Resources.Food;
 
-        case -34:
-          return ResourceType.PlatinumToolkit;
+        case 5:
+          return Resources.Darkwood;
+
+        case 6:
+          return Resources.Runestone;
+
+        case 7:
+          return Resources.Veritium;
+
+        case 8:
+          return Resources.Trueseed;
 
         default:
           throw new Exception("INVALID_RESOURCE");
       }
     }
 
-    public static int ConvertResource(ResourceType resourceType)
+    [Obsolete("Use the enum values for Resources.")]
+    public static int ConvertResource(Resources resources)
     {
-      switch (resourceType)
+      switch (resources)
       {
-        case ResourceType.Gold:
+        case Resources.Gold:
           return 0;
 
-        case ResourceType.Wood:
+        case Resources.Wood:
           return 1;
 
-        case ResourceType.Stone:
+        case Resources.Stone:
           return 2;
 
-        case ResourceType.Iron:
+        case Resources.Iron:
           return 3;
 
-        case ResourceType.Food:
+        case Resources.Food:
           return 4;
 
-        case ResourceType.PlatinumToolkit:
-          return -34;
+        case Resources.Darkwood:
+          return 5;
+
+        case Resources.Runestone:
+          return 6;
+
+        case Resources.Veritium:
+          return 7;
+
+        case Resources.Trueseed:
+          return 8;
 
         default:
           throw new Exception("INVALID_RESOURCE");
@@ -177,61 +245,61 @@ namespace EEM.Common
     /// </summary>
     /// <param name="militaryUnitId"></param>
     /// <returns></returns>
-    public static MilitaryUnitType ConvertMilitaryUnit(int militaryUnitId)
+    [Obsolete("Use the enum values for MilitaryUnits.")]
+    public static MilitaryUnits ConvertMilitaryUnit(int militaryUnitId)
     {
       switch (militaryUnitId)
       {
+        case 1:
+          return MilitaryUnits.CityGuard;
 
         case 2:
-          return MilitaryUnitType.Ballista;
+          return MilitaryUnits.Ballista;
 
         case 3:
-          return MilitaryUnitType.Ranger;
+          return MilitaryUnits.Ranger;
         
         case 4:
-          return MilitaryUnitType.Guardian;
+          return MilitaryUnits.Guardian;
 
         case 5:
-          return MilitaryUnitType.Templar;
+          return MilitaryUnits.Templar;
 
         case 6:
-          return MilitaryUnitType.Berserker;
+          return MilitaryUnits.Berserker;
 
         case 7:
-          return MilitaryUnitType.Mage;
+          return MilitaryUnits.Mage;
 
         case 8:
-          return MilitaryUnitType.Scout;
+          return MilitaryUnits.Scout;
 
         case 9:
-          return MilitaryUnitType.Crossbowman;
+          return MilitaryUnits.Crossbowman;
 
         case 10:
-          return MilitaryUnitType.Paladin;
+          return MilitaryUnits.Paladin;
 
         case 11:
-          return MilitaryUnitType.Knight;
+          return MilitaryUnits.Knight;
 
         case 12:
-          return MilitaryUnitType.Warlock;
+          return MilitaryUnits.Warlock;
 
         case 13:
-          return MilitaryUnitType.Ram;
+          return MilitaryUnits.Ram;
 
         case 14:
-          return MilitaryUnitType.Catapult;
+          return MilitaryUnits.Catapult;
 
         case 15:
-          return MilitaryUnitType.Frigate;
+          return MilitaryUnits.Frigate;
 
         case 16:
-          return MilitaryUnitType.Sloop;
+          return MilitaryUnits.Sloop;
 
         case 17:
-          return MilitaryUnitType.WarGalleon;
-
-        case 48:
-          return MilitaryUnitType.Dragon;
+          return MilitaryUnits.WarGalleon;
 
         default:
           throw new Exception("INVALID_MilitaryUnit");
@@ -242,6 +310,21 @@ namespace EEM.Common
     {
       return new DateTime((jsondate * 10000000) + 621355968000000000);
     }
+
+    public static DateTime ConvertFromUnixTimestamp(double timestamp)
+    {
+      DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+      return origin.AddSeconds(timestamp);
+    }
+
+
+    public static double ConvertToUnixTimestamp(DateTime date)
+    {
+      DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+      TimeSpan diff = date - origin;
+      return diff.TotalSeconds;
+    }
+
 
     /// <summary>
     /// Converts a date that is assumed to be have an offset from UTC of sourceUtcOffset to an offset from UTC of targetUtcOffset
@@ -257,9 +340,83 @@ namespace EEM.Common
       return targetDateTime;
     }
 
-    internal static object ConvertBuildingType(BuildingType buildingtype)
+    public static object ConvertBuildingType(BuildingType buildingtype)
     {
       throw new NotImplementedException();
+    }
+
+    [Obsolete("Use the enum values for title.")]
+    public static Titles ConvertTitle(int titleId)
+    {
+      switch (titleId)
+      {
+        case 1:
+          return Titles.Sir;
+
+        case 2:
+          return Titles.Knight;
+
+        case 3:
+          return Titles.Baron;
+
+        case 5:
+          return Titles.Earl;
+
+        case 6:
+          return Titles.Marquess;
+
+        case 7:
+          return Titles.Prince;
+
+        case 8:
+          return Titles.Duke;
+
+        case 9:
+          return Titles.King;
+
+        case 10:
+          return Titles.Emperor;
+
+        default:
+          throw new Exception("INVALID_Title");
+      }
+    }
+
+    [Obsolete("Use the enum values for title.")]
+    public static int ConvertTitle(Titles titlename)
+    {
+      switch (titlename)
+      {
+        case Titles.Sir:
+          return 1;
+
+        case Titles.Knight:
+          return 2;
+
+        case Titles.Baron:
+          return 3;
+
+        case Titles.Earl:
+          return 5;
+
+        case Titles.Marquess:
+          return 6;
+
+        case Titles.Prince:
+          return 7;
+
+        case Titles.Duke:
+          return 8;
+
+        case Titles.King:
+          return 9;
+
+        case Titles.Emperor:
+          return 10;
+
+        default:
+          throw new Exception("INVALID_Title");
+      }
     }
   }
 }

@@ -5,7 +5,7 @@
     public int t { get; set; }
     public int v { get; set; }
     
-    public ResourceType Resource 
+    public Resources Resource 
     {
       get { return ConversionUtil.ConvertResource(t); }
     }

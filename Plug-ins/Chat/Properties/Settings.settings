@@ -32,5 +32,11 @@
     <Setting Name="ChatLogFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">c:\\eem.chat.log</Value>
     </Setting>
+    <Setting Name="ChatLogFormat" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ApacheStyle</Value>
+    </Setting>
+    <Setting Name="ApplicationVersion" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1.1</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

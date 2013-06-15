@@ -5,6 +5,7 @@ using EEM.Common;
 using EEM.Common.Adapters;
 using EEM.Common.PluginInterface;
 using EEM.Properties;
+using Resources = EEM.Properties.Resources;
 
 namespace EEM
 {
@@ -55,6 +56,8 @@ namespace EEM
       {
         connectToolStripMenuItem_Click(null, null);
       }
+
+      LoUAdapter.OnCurrentCityChange += LoUAdapter_OnCurrentCityChange;
     }
 
     /// <summary>
@@ -139,6 +142,13 @@ namespace EEM
           {
             filemenu.DropDownItems["connectToolStripMenuItem"].Text = "&Disconnect";
           }
+
+          // Get Info about a player.
+          if (_loUAdapter.CurrentPlayer != null)
+          {
+            toolStripStatusLabelPlayerName.Text = _loUAdapter.CurrentPlayer.Name + "@" + _loUAdapter.CurrentPlayer.AllianceName;
+          }
+
           break;
 
         case ConnectionState.Disconnected:
@@ -189,24 +199,39 @@ namespace EEM
       _loUAdapter.SetCredentials(_credentials);
     }
 
+    /// <summary>
+    /// Changes the name of the displayed city. 
+    /// </summary>
+    /// <param name="newCity"></param>
+    void LoUAdapter_OnCurrentCityChange(City newCity)
+    {
+      toolStripStatusLabelCurrentCityName.Text = newCity.Name;
+    }
+
     // ReSharper disable InconsistentNaming
     private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
     // ReSharper restore InconsistentNaming
     {
-      new OptionsScreen().ShowDialog(this);
+      var optionsScreen = new OptionsScreen();
+      optionsScreen.ShowDialog(this);
+
+      if (!optionsScreen.SaveClicked) return;
+
       var config = new AdapterConfiguration
-      {
-        GameServerUrl = Settings.Default.Server,
-        HomePageUrl = Settings.Default.LoUUrl,
-      };
+                     {
+                       GameServerUrl = Settings.Default.Server,
+                       HomePageUrl = Settings.Default.LoUUrl,
+                     };
 
       if (_loUAdapter.ConnectionState == ConnectionState.Connected)
       {
-        MessageBox.Show(Resources.MainScreen_optionsToolStripMenuItem_Click_Changes_to_game_server_settings_require_you_to_disconnect_and_reconnect, Resources.MainScreen_optionsToolStripMenuItem_Click_Warning, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        MessageBox.Show(
+          Resources.
+            MainScreen_optionsToolStripMenuItem_Click_Changes_to_game_server_settings_require_you_to_disconnect_and_reconnect,
+          Resources.MainScreen_optionsToolStripMenuItem_Click_Warning, MessageBoxButtons.OK, MessageBoxIcon.Warning);
         _loUAdapter.Disconnect();
       }
       _loUAdapter.Configuration = config;
-
     }
 
     #endregion
@@ -238,7 +263,7 @@ namespace EEM
           fileMenu.DropDownItems.Add(toolStripMenuItem);
           break;
         case EEMMenuItems.Edit:
-          editMenu.DropDownItems.Add(toolStripMenuItem);
+          //editMenu.DropDownItems.Add(toolStripMenuItem);
           break;
         case EEMMenuItems.View:
           viewMenu.DropDownItems.Add(toolStripMenuItem);
@@ -268,7 +293,7 @@ namespace EEM
           fileMenu.DropDownItems.Remove(toolStripMenuItem);
           break;
         case EEMMenuItems.Edit:
-          editMenu.DropDownItems.Remove(toolStripMenuItem);
+          //editMenu.DropDownItems.Remove(toolStripMenuItem);
           break;
         case EEMMenuItems.View:
           viewMenu.DropDownItems.Remove(toolStripMenuItem);
@@ -286,5 +311,36 @@ namespace EEM
     }
 
     #endregion
+
+    private void ExitToolStripMenuItemClick(object sender, EventArgs e)
+    {
+      Environment.Exit(0);
+    }
+
+    private void MainScreenResize(object sender, EventArgs e)
+    {
+      if (FormWindowState.Minimized == WindowState && Settings.Default.MinimizeToSystemTray)
+      {
+        notifyIcon.Visible = true;
+        Hide(); 
+      }
+    }
+
+    private void NotifyIconDoubleClick(object sender, EventArgs e)
+    {
+      ShowScreen();
+    }
+
+    private void ShowScreen()
+    {
+      notifyIcon.Visible = false;
+      Show();
+      WindowState = FormWindowState.Normal;      
+    }
+
+    private void OpenToolStripMenuItemClick(object sender, EventArgs e)
+    {
+      ShowScreen();
+    }
   }
 }

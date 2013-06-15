@@ -29,7 +29,6 @@ namespace EEM.Common.Protocol
     {
       get { return n; }
     }
-    
   }
 
   public class ServerInfoResponseMS 

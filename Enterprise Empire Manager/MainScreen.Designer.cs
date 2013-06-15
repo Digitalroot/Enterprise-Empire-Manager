@@ -39,12 +39,6 @@ namespace EEM
       this.changeLoginToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
       this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.editMenu = new System.Windows.Forms.ToolStripMenuItem();
-      this.cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-      this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.viewMenu = new System.Windows.Forms.ToolStripMenuItem();
       this.loadedPluginsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -59,17 +53,24 @@ namespace EEM
       this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.statusStrip = new System.Windows.Forms.StatusStrip();
       this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+      this.toolStripStatusLabelCurrentCityName = new System.Windows.Forms.ToolStripStatusLabel();
+      this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+      this.toolStripStatusLabelPlayerName = new System.Windows.Forms.ToolStripStatusLabel();
       this.connectionIconStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
       this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+      this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+      this.contextMenuStripSysTray = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.exitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
       this.menuStrip.SuspendLayout();
       this.statusStrip.SuspendLayout();
+      this.contextMenuStripSysTray.SuspendLayout();
       this.SuspendLayout();
       // 
       // menuStrip
       // 
       this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileMenu,
-            this.editMenu,
             this.viewMenu,
             this.toolsMenu,
             this.windowsMenu,
@@ -90,7 +91,7 @@ namespace EEM
             this.exitToolStripMenuItem});
       this.fileMenu.ImageTransparentColor = System.Drawing.SystemColors.ActiveBorder;
       this.fileMenu.Name = "fileMenu";
-      this.fileMenu.Size = new System.Drawing.Size(35, 20);
+      this.fileMenu.Size = new System.Drawing.Size(37, 20);
       this.fileMenu.Text = "&File";
       // 
       // connectToolStripMenuItem
@@ -98,79 +99,28 @@ namespace EEM
       this.connectToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Black;
       this.connectToolStripMenuItem.Name = "connectToolStripMenuItem";
       this.connectToolStripMenuItem.ShowShortcutKeys = false;
-      this.connectToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+      this.connectToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
       this.connectToolStripMenuItem.Text = "&Connect";
       this.connectToolStripMenuItem.Click += new System.EventHandler(this.connectToolStripMenuItem_Click);
       // 
       // changeLoginToolStripMenuItem
       // 
       this.changeLoginToolStripMenuItem.Name = "changeLoginToolStripMenuItem";
-      this.changeLoginToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+      this.changeLoginToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
       this.changeLoginToolStripMenuItem.Text = "Change Login";
       this.changeLoginToolStripMenuItem.Click += new System.EventHandler(this.changeLoginToolStripMenuItem_Click);
       // 
       // toolStripSeparator3
       // 
       this.toolStripSeparator3.Name = "toolStripSeparator3";
-      this.toolStripSeparator3.Size = new System.Drawing.Size(147, 6);
+      this.toolStripSeparator3.Size = new System.Drawing.Size(145, 6);
       // 
       // exitToolStripMenuItem
       // 
       this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-      this.exitToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+      this.exitToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
       this.exitToolStripMenuItem.Text = "E&xit";
       this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
-      // 
-      // editMenu
-      // 
-      this.editMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cutToolStripMenuItem,
-            this.copyToolStripMenuItem,
-            this.pasteToolStripMenuItem,
-            this.toolStripSeparator7,
-            this.selectAllToolStripMenuItem});
-      this.editMenu.Name = "editMenu";
-      this.editMenu.Size = new System.Drawing.Size(37, 20);
-      this.editMenu.Text = "&Edit";
-      // 
-      // cutToolStripMenuItem
-      // 
-      this.cutToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("cutToolStripMenuItem.Image")));
-      this.cutToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Black;
-      this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
-      this.cutToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-      this.cutToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
-      this.cutToolStripMenuItem.Text = "Cu&t";
-      // 
-      // copyToolStripMenuItem
-      // 
-      this.copyToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("copyToolStripMenuItem.Image")));
-      this.copyToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Black;
-      this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-      this.copyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-      this.copyToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
-      this.copyToolStripMenuItem.Text = "&Copy";
-      // 
-      // pasteToolStripMenuItem
-      // 
-      this.pasteToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("pasteToolStripMenuItem.Image")));
-      this.pasteToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Black;
-      this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
-      this.pasteToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-      this.pasteToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
-      this.pasteToolStripMenuItem.Text = "&Paste";
-      // 
-      // toolStripSeparator7
-      // 
-      this.toolStripSeparator7.Name = "toolStripSeparator7";
-      this.toolStripSeparator7.Size = new System.Drawing.Size(164, 6);
-      // 
-      // selectAllToolStripMenuItem
-      // 
-      this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-      this.selectAllToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-      this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
-      this.selectAllToolStripMenuItem.Text = "Select &All";
       // 
       // viewMenu
       // 
@@ -178,7 +128,7 @@ namespace EEM
             this.loadedPluginsToolStripMenuItem,
             this.toolStripSeparator1});
       this.viewMenu.Name = "viewMenu";
-      this.viewMenu.Size = new System.Drawing.Size(41, 20);
+      this.viewMenu.Size = new System.Drawing.Size(44, 20);
       this.viewMenu.Text = "&View";
       // 
       // loadedPluginsToolStripMenuItem
@@ -198,13 +148,13 @@ namespace EEM
       this.toolsMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.optionsToolStripMenuItem});
       this.toolsMenu.Name = "toolsMenu";
-      this.toolsMenu.Size = new System.Drawing.Size(44, 20);
+      this.toolsMenu.Size = new System.Drawing.Size(48, 20);
       this.toolsMenu.Text = "&Tools";
       // 
       // optionsToolStripMenuItem
       // 
       this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-      this.optionsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.optionsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
       this.optionsToolStripMenuItem.Text = "&Options";
       this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
       // 
@@ -216,34 +166,34 @@ namespace EEM
             this.tileHorizontalToolStripMenuItem,
             this.closeAllToolStripMenuItem});
       this.windowsMenu.Name = "windowsMenu";
-      this.windowsMenu.Size = new System.Drawing.Size(62, 20);
+      this.windowsMenu.Size = new System.Drawing.Size(68, 20);
       this.windowsMenu.Text = "&Windows";
       // 
       // cascadeToolStripMenuItem
       // 
       this.cascadeToolStripMenuItem.Name = "cascadeToolStripMenuItem";
-      this.cascadeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.cascadeToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
       this.cascadeToolStripMenuItem.Text = "&Cascade";
       this.cascadeToolStripMenuItem.Click += new System.EventHandler(this.cascadeToolStripMenuItem_Click);
       // 
       // tileVerticalToolStripMenuItem
       // 
       this.tileVerticalToolStripMenuItem.Name = "tileVerticalToolStripMenuItem";
-      this.tileVerticalToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.tileVerticalToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
       this.tileVerticalToolStripMenuItem.Text = "Tile &Vertical";
       this.tileVerticalToolStripMenuItem.Click += new System.EventHandler(this.tileVerticalToolStripMenuItem_Click);
       // 
       // tileHorizontalToolStripMenuItem
       // 
       this.tileHorizontalToolStripMenuItem.Name = "tileHorizontalToolStripMenuItem";
-      this.tileHorizontalToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.tileHorizontalToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
       this.tileHorizontalToolStripMenuItem.Text = "Tile &Horizontal";
       this.tileHorizontalToolStripMenuItem.Click += new System.EventHandler(this.tileHorizontalToolStripMenuItem_Click);
       // 
       // closeAllToolStripMenuItem
       // 
       this.closeAllToolStripMenuItem.Name = "closeAllToolStripMenuItem";
-      this.closeAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.closeAllToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
       this.closeAllToolStripMenuItem.Text = "C&lose All";
       this.closeAllToolStripMenuItem.Click += new System.EventHandler(this.closeAllToolStripMenuItem_Click);
       // 
@@ -252,13 +202,13 @@ namespace EEM
       this.helpMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem});
       this.helpMenu.Name = "helpMenu";
-      this.helpMenu.Size = new System.Drawing.Size(40, 20);
+      this.helpMenu.Size = new System.Drawing.Size(44, 20);
       this.helpMenu.Text = "&Help";
       // 
       // aboutToolStripMenuItem
       // 
       this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-      this.aboutToolStripMenuItem.Size = new System.Drawing.Size(246, 22);
+      this.aboutToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
       this.aboutToolStripMenuItem.Text = "&About Enterprise Empire Manager";
       this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
       // 
@@ -266,6 +216,9 @@ namespace EEM
       // 
       this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel,
+            this.toolStripStatusLabelCurrentCityName,
+            this.toolStripStatusLabel1,
+            this.toolStripStatusLabelPlayerName,
             this.connectionIconStripStatusLabel});
       this.statusStrip.Location = new System.Drawing.Point(0, 435);
       this.statusStrip.Name = "statusStrip";
@@ -276,16 +229,63 @@ namespace EEM
       // toolStripStatusLabel
       // 
       this.toolStripStatusLabel.Name = "toolStripStatusLabel";
-      this.toolStripStatusLabel.Size = new System.Drawing.Size(689, 17);
+      this.toolStripStatusLabel.Size = new System.Drawing.Size(498, 17);
       this.toolStripStatusLabel.Spring = true;
       this.toolStripStatusLabel.Text = "Click Connect from the File Menu to Connect.";
       this.toolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      // 
+      // toolStripStatusLabelCurrentCityName
+      // 
+      this.toolStripStatusLabelCurrentCityName.Name = "toolStripStatusLabelCurrentCityName";
+      this.toolStripStatusLabelCurrentCityName.Size = new System.Drawing.Size(94, 17);
+      this.toolStripStatusLabelCurrentCityName.Text = "No City Selected";
+      // 
+      // toolStripStatusLabel1
+      // 
+      this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+      this.toolStripStatusLabel1.Size = new System.Drawing.Size(12, 17);
+      this.toolStripStatusLabel1.Text = "-";
+      // 
+      // toolStripStatusLabelPlayerName
+      // 
+      this.toolStripStatusLabelPlayerName.Name = "toolStripStatusLabelPlayerName";
+      this.toolStripStatusLabelPlayerName.Size = new System.Drawing.Size(85, 17);
+      this.toolStripStatusLabelPlayerName.Text = "Requires Login";
       // 
       // connectionIconStripStatusLabel
       // 
       this.connectionIconStripStatusLabel.Image = global::EEM.Properties.Resources.icon_yellowdot;
       this.connectionIconStripStatusLabel.Name = "connectionIconStripStatusLabel";
       this.connectionIconStripStatusLabel.Size = new System.Drawing.Size(16, 17);
+      // 
+      // notifyIcon
+      // 
+      this.notifyIcon.ContextMenuStrip = this.contextMenuStripSysTray;
+      this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
+      this.notifyIcon.Text = "EEM";
+      this.notifyIcon.DoubleClick += new System.EventHandler(this.NotifyIconDoubleClick);
+      // 
+      // contextMenuStripSysTray
+      // 
+      this.contextMenuStripSysTray.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openToolStripMenuItem,
+            this.exitToolStripMenuItem1});
+      this.contextMenuStripSysTray.Name = "contextMenuStrip1";
+      this.contextMenuStripSysTray.Size = new System.Drawing.Size(153, 70);
+      // 
+      // openToolStripMenuItem
+      // 
+      this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+      this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.openToolStripMenuItem.Text = "&Open";
+      this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItemClick);
+      // 
+      // exitToolStripMenuItem1
+      // 
+      this.exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
+      this.exitToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+      this.exitToolStripMenuItem1.Text = "E&xit";
+      this.exitToolStripMenuItem1.Click += new System.EventHandler(this.ExitToolStripMenuItemClick);
       // 
       // MainScreen
       // 
@@ -300,10 +300,12 @@ namespace EEM
       this.Name = "MainScreen";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
       this.Text = "Enterprise Empire Manager";
+      this.Resize += new System.EventHandler(this.MainScreenResize);
       this.menuStrip.ResumeLayout(false);
       this.menuStrip.PerformLayout();
       this.statusStrip.ResumeLayout(false);
       this.statusStrip.PerformLayout();
+      this.contextMenuStripSysTray.ResumeLayout(false);
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -314,18 +316,12 @@ namespace EEM
     private System.Windows.Forms.MenuStrip menuStrip;
     private System.Windows.Forms.StatusStrip statusStrip;
     private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-    private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
     private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
     private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem tileHorizontalToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem fileMenu;
     private System.Windows.Forms.ToolStripMenuItem connectToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-    private System.Windows.Forms.ToolStripMenuItem editMenu;
-    private System.Windows.Forms.ToolStripMenuItem cutToolStripMenuItem;
-    private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
-    private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
-    private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem viewMenu;
     private System.Windows.Forms.ToolStripMenuItem toolsMenu;
     private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
@@ -388,6 +384,14 @@ namespace EEM
     {
       new LoadedPluginsScreen(Plugins).ShowDialog(this);
     }
+
+    private ToolStripStatusLabel toolStripStatusLabelPlayerName;
+    private ToolStripStatusLabel toolStripStatusLabelCurrentCityName;
+    private ToolStripStatusLabel toolStripStatusLabel1;
+    private NotifyIcon notifyIcon;
+    private ContextMenuStrip contextMenuStripSysTray;
+    private ToolStripMenuItem openToolStripMenuItem;
+    private ToolStripMenuItem exitToolStripMenuItem1;
   }
 }
 

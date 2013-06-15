@@ -30,6 +30,10 @@
     {
       this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
+      this.button1 = new System.Windows.Forms.Button();
+      this.label1 = new System.Windows.Forms.Label();
+      this.textBoxLogFile = new System.Windows.Forms.TextBox();
+      this.checkBoxEnableLogging = new System.Windows.Forms.CheckBox();
       this.checkBoxOpenOnStart = new System.Windows.Forms.CheckBox();
       this.labelTimeStampColor = new System.Windows.Forms.Label();
       this.buttonSetTimeStampColor = new System.Windows.Forms.Button();
@@ -52,11 +56,9 @@
       this.colorDialogContinent = new System.Windows.Forms.ColorDialog();
       this.colorDialogSystem = new System.Windows.Forms.ColorDialog();
       this.colorDialogTimeStamp = new System.Windows.Forms.ColorDialog();
-      this.checkBoxEnableLogging = new System.Windows.Forms.CheckBox();
-      this.textBoxLogFile = new System.Windows.Forms.TextBox();
-      this.label1 = new System.Windows.Forms.Label();
-      this.button1 = new System.Windows.Forms.Button();
       this.saveLogFileDialog = new System.Windows.Forms.SaveFileDialog();
+      this.label2 = new System.Windows.Forms.Label();
+      this.comboBoxLogFormat = new System.Windows.Forms.ComboBox();
       this.tableLayoutPanel1.SuspendLayout();
       this.groupBox1.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBackground)).BeginInit();
@@ -81,6 +83,8 @@
       // 
       // groupBox1
       // 
+      this.groupBox1.Controls.Add(this.comboBoxLogFormat);
+      this.groupBox1.Controls.Add(this.label2);
       this.groupBox1.Controls.Add(this.button1);
       this.groupBox1.Controls.Add(this.label1);
       this.groupBox1.Controls.Add(this.textBoxLogFile);
@@ -107,13 +111,51 @@
       this.groupBox1.TabStop = false;
       this.groupBox1.Text = "Text Color";
       // 
+      // button1
+      // 
+      this.button1.Location = new System.Drawing.Point(190, 247);
+      this.button1.Name = "button1";
+      this.button1.Size = new System.Drawing.Size(24, 23);
+      this.button1.TabIndex = 9;
+      this.button1.Text = "...";
+      this.button1.UseVisualStyleBackColor = true;
+      this.button1.Click += new System.EventHandler(this.button1_Click);
+      // 
+      // label1
+      // 
+      this.label1.AutoSize = true;
+      this.label1.Location = new System.Drawing.Point(6, 252);
+      this.label1.Name = "label1";
+      this.label1.Size = new System.Drawing.Size(44, 13);
+      this.label1.TabIndex = 17;
+      this.label1.Text = "Log file:";
+      // 
+      // textBoxLogFile
+      // 
+      this.textBoxLogFile.BackColor = System.Drawing.Color.White;
+      this.textBoxLogFile.Location = new System.Drawing.Point(56, 249);
+      this.textBoxLogFile.Name = "textBoxLogFile";
+      this.textBoxLogFile.ReadOnly = true;
+      this.textBoxLogFile.Size = new System.Drawing.Size(128, 20);
+      this.textBoxLogFile.TabIndex = 8;
+      // 
+      // checkBoxEnableLogging
+      // 
+      this.checkBoxEnableLogging.AutoSize = true;
+      this.checkBoxEnableLogging.Location = new System.Drawing.Point(6, 226);
+      this.checkBoxEnableLogging.Name = "checkBoxEnableLogging";
+      this.checkBoxEnableLogging.Size = new System.Drawing.Size(81, 17);
+      this.checkBoxEnableLogging.TabIndex = 7;
+      this.checkBoxEnableLogging.Text = "Log to a file";
+      this.checkBoxEnableLogging.UseVisualStyleBackColor = true;
+      // 
       // checkBoxOpenOnStart
       // 
       this.checkBoxOpenOnStart.AutoSize = true;
       this.checkBoxOpenOnStart.Location = new System.Drawing.Point(6, 203);
       this.checkBoxOpenOnStart.Name = "checkBoxOpenOnStart";
       this.checkBoxOpenOnStart.Size = new System.Drawing.Size(171, 17);
-      this.checkBoxOpenOnStart.TabIndex = 14;
+      this.checkBoxOpenOnStart.TabIndex = 6;
       this.checkBoxOpenOnStart.Text = "Open Chat Window on Startup";
       this.checkBoxOpenOnStart.UseVisualStyleBackColor = true;
       // 
@@ -131,7 +173,7 @@
       this.buttonSetTimeStampColor.Location = new System.Drawing.Point(134, 167);
       this.buttonSetTimeStampColor.Name = "buttonSetTimeStampColor";
       this.buttonSetTimeStampColor.Size = new System.Drawing.Size(75, 23);
-      this.buttonSetTimeStampColor.TabIndex = 12;
+      this.buttonSetTimeStampColor.TabIndex = 5;
       this.buttonSetTimeStampColor.Text = "Set";
       this.buttonSetTimeStampColor.UseVisualStyleBackColor = true;
       this.buttonSetTimeStampColor.Click += new System.EventHandler(this.buttonSetTimeStampColor_Click);
@@ -141,7 +183,7 @@
       this.buttonSetSystemChatColor.Location = new System.Drawing.Point(135, 137);
       this.buttonSetSystemChatColor.Name = "buttonSetSystemChatColor";
       this.buttonSetSystemChatColor.Size = new System.Drawing.Size(75, 23);
-      this.buttonSetSystemChatColor.TabIndex = 11;
+      this.buttonSetSystemChatColor.TabIndex = 4;
       this.buttonSetSystemChatColor.Text = "Set";
       this.buttonSetSystemChatColor.UseVisualStyleBackColor = true;
       this.buttonSetSystemChatColor.Click += new System.EventHandler(this.buttonSetSystemChatColor_Click);
@@ -160,7 +202,7 @@
       this.SetContinentChatColorButton.Location = new System.Drawing.Point(135, 107);
       this.SetContinentChatColorButton.Name = "SetContinentChatColorButton";
       this.SetContinentChatColorButton.Size = new System.Drawing.Size(75, 23);
-      this.SetContinentChatColorButton.TabIndex = 9;
+      this.SetContinentChatColorButton.TabIndex = 3;
       this.SetContinentChatColorButton.Text = "Set";
       this.SetContinentChatColorButton.UseVisualStyleBackColor = true;
       this.SetContinentChatColorButton.Click += new System.EventHandler(this.SetContinentChatColorButton_Click);
@@ -179,7 +221,7 @@
       this.SetAllianceChatColorButton.Location = new System.Drawing.Point(134, 77);
       this.SetAllianceChatColorButton.Name = "SetAllianceChatColorButton";
       this.SetAllianceChatColorButton.Size = new System.Drawing.Size(75, 23);
-      this.SetAllianceChatColorButton.TabIndex = 6;
+      this.SetAllianceChatColorButton.TabIndex = 2;
       this.SetAllianceChatColorButton.Text = "Set";
       this.SetAllianceChatColorButton.UseVisualStyleBackColor = true;
       this.SetAllianceChatColorButton.Click += new System.EventHandler(this.SetAllianceChatColorButton_Click);
@@ -200,7 +242,7 @@
       this.SetBackgroundColorButton.Location = new System.Drawing.Point(134, 19);
       this.SetBackgroundColorButton.Name = "SetBackgroundColorButton";
       this.SetBackgroundColorButton.Size = new System.Drawing.Size(75, 23);
-      this.SetBackgroundColorButton.TabIndex = 4;
+      this.SetBackgroundColorButton.TabIndex = 0;
       this.SetBackgroundColorButton.Text = "Set";
       this.SetBackgroundColorButton.UseVisualStyleBackColor = true;
       this.SetBackgroundColorButton.Click += new System.EventHandler(this.SetBackgroundColorButton_Click);
@@ -220,7 +262,7 @@
       this.SetWhisperChatColorButton.Location = new System.Drawing.Point(134, 48);
       this.SetWhisperChatColorButton.Name = "SetWhisperChatColorButton";
       this.SetWhisperChatColorButton.Size = new System.Drawing.Size(75, 23);
-      this.SetWhisperChatColorButton.TabIndex = 2;
+      this.SetWhisperChatColorButton.TabIndex = 1;
       this.SetWhisperChatColorButton.Text = "Set";
       this.SetWhisperChatColorButton.UseVisualStyleBackColor = true;
       this.SetWhisperChatColorButton.Click += new System.EventHandler(this.SetWhisperChatColorButton_Click);
@@ -270,43 +312,26 @@
       this.ApplyButton.UseVisualStyleBackColor = true;
       this.ApplyButton.Click += new System.EventHandler(this.ApplyButton_Click);
       // 
-      // checkBoxEnableLogging
+      // label2
       // 
-      this.checkBoxEnableLogging.AutoSize = true;
-      this.checkBoxEnableLogging.Location = new System.Drawing.Point(6, 226);
-      this.checkBoxEnableLogging.Name = "checkBoxEnableLogging";
-      this.checkBoxEnableLogging.Size = new System.Drawing.Size(81, 17);
-      this.checkBoxEnableLogging.TabIndex = 15;
-      this.checkBoxEnableLogging.Text = "Log to a file";
-      this.checkBoxEnableLogging.UseVisualStyleBackColor = true;
+      this.label2.AutoSize = true;
+      this.label2.Location = new System.Drawing.Point(6, 278);
+      this.label2.Name = "label2";
+      this.label2.Size = new System.Drawing.Size(60, 13);
+      this.label2.TabIndex = 19;
+      this.label2.Text = "Log format:";
       // 
-      // textBoxLogFile
+      // comboBoxLogFormat
       // 
-      this.textBoxLogFile.BackColor = System.Drawing.Color.White;
-      this.textBoxLogFile.Location = new System.Drawing.Point(56, 249);
-      this.textBoxLogFile.Name = "textBoxLogFile";
-      this.textBoxLogFile.ReadOnly = true;
-      this.textBoxLogFile.Size = new System.Drawing.Size(128, 20);
-      this.textBoxLogFile.TabIndex = 16;
-      // 
-      // label1
-      // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(6, 252);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(44, 13);
-      this.label1.TabIndex = 17;
-      this.label1.Text = "Log file:";
-      // 
-      // button1
-      // 
-      this.button1.Location = new System.Drawing.Point(190, 247);
-      this.button1.Name = "button1";
-      this.button1.Size = new System.Drawing.Size(24, 23);
-      this.button1.TabIndex = 18;
-      this.button1.Text = "...";
-      this.button1.UseVisualStyleBackColor = true;
-      this.button1.Click += new System.EventHandler(this.button1_Click);
+      this.comboBoxLogFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.comboBoxLogFormat.FormattingEnabled = true;
+      this.comboBoxLogFormat.Items.AddRange(new object[] {
+            "Apache Style",
+            "CSV"});
+      this.comboBoxLogFormat.Location = new System.Drawing.Point(72, 275);
+      this.comboBoxLogFormat.Name = "comboBoxLogFormat";
+      this.comboBoxLogFormat.Size = new System.Drawing.Size(137, 21);
+      this.comboBoxLogFormat.TabIndex = 10;
       // 
       // OptionsScreen
       // 
@@ -361,5 +386,7 @@
     private System.Windows.Forms.TextBox textBoxLogFile;
     private System.Windows.Forms.CheckBox checkBoxEnableLogging;
     private System.Windows.Forms.SaveFileDialog saveLogFileDialog;
+    private System.Windows.Forms.ComboBox comboBoxLogFormat;
+    private System.Windows.Forms.Label label2;
   }
 }

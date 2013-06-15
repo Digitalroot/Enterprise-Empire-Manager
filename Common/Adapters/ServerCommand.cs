@@ -2,11 +2,11 @@
 {
   public enum ServerCommand
   {
-    
     AbandonCity, // {"session":"00000000-a4ee-42d4-b827-2bd438764ffa","cityid":"20381930"}
     AllianceGetContinentCount, // {"session":"00000000-0235-4b4b-a301-e4491e4c5be7"}
     AllianceGetCount, // {"session":"00000000-a4ee-42d4-b827-2bd438764ffa"}
-    AllianceGetRange, // {"session":"00000000-96e4-41f6-b3ce-1ac451b6b5b8","start":0,"end":99,"sort":-1,"ascending":true}
+    AllianceGetCountAndIndex, // {"session":"00000000-c7cd-464b-94b9-bc58582188e7","continent":-1,"sort":0,"ascending":true}
+    AllianceGetRange, // {"session":"00000000-c7cd-464b-94b9-bc58582188e7","start":0,"end":99,"continent":-1,"sort":0,"ascending":true}
     CancelBuild, // {"session":"00000000-96e4-41f6-b3ce-1ac451b6b5b8","cityid":"15794563","queueid":670765890}
     CancelUnitOrder, // {"session":"00000000-a4ee-42d4-b827-2bd438764ffa","cityid":"20971776","id":22798515,"isDelayed":false}
     CityNoteSet, // {"session":"00000000-96e4-41f6-b3ce-1ac451b6b5b8","cityid":"15597953","reference":"Resource Vault","text":"Max Resource storage and trading.\nAlso max hideouts. \nShould have a balista Def\n\nDump to 370:231 CA N 01\n\nLand at 21:157\nz"}
@@ -24,6 +24,7 @@
     GetPublicAllianceInfo, // {"session":"00000000-96e4-41f6-b3ce-1ac451b6b5b8","id":13221}
     GetPublicAllianceMemberList, // {"session":"00000000-96e4-41f6-b3ce-1ac451b6b5b8","id":13221}
     GetPublicCityInfo, // {"session":"00000000-96e4-41f6-b3ce-1ac451b6b5b8","id":16974186}
+    GetPublicPlayerInfo, // {"session":"00000000-96e4-41f6-b3ce-1ac451b6b5b8","id":16974186}
     GetPublicPlayerInfoByName, // {"session":"00000000-96e4-41f6-b3ce-1ac451b6b5b8","name":"Kryllik"}
     GetReport,
     GetServerInfo,

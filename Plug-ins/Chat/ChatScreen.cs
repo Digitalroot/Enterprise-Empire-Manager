@@ -19,7 +19,6 @@ namespace EEM.Plugin.Chat
     private readonly IEnterpriseEmpireManager _enterpriseEmpireManager;
     internal List<string> ChatBoxData = new List<string>();
     private bool _enableLoggin;
-    private string _logFile;
 
     /// <summary>
     /// Constructor
@@ -38,26 +37,26 @@ namespace EEM.Plugin.Chat
       chattarget.BackColor = Settings.Default.ColorOfBackground;
       SetInputTextColor();
 
-      _loUAdapter.OnChatResponse += loUAdapter_OnChatResponse;
-      _loUAdapter.OnConnectionStateChange += loUAdapter_OnConnectionStateChange;
-      loUAdapter_OnConnectionStateChange(_loUAdapter.ConnectionState);
-
       _enableLoggin = Settings.Default.EnableLogging;
-      _logFile = Settings.Default.ChatLogFile;
     }
 
-    void loUAdapter_OnConnectionStateChange(ConnectionState connectionState )
+    void loUAdapter_OnConnectionStateChange(ConnectionState connectionState)
+    {
+      HandleConnectionState(connectionState);
+    }
+
+    private void HandleConnectionState(ConnectionState connectionState)
     {
       switch (connectionState)
       {
         case ConnectionState.Connected:
           PollRequestItems[] item = { PollRequestItems.CHAT };
-          _loUAdapter.AddPollRequestItems(item, String.Empty);
+          _loUAdapter.PollingService.AddPollRequestItems(item, String.Empty);
           break;
 
         case ConnectionState.Disconnected:
           break;
-      }
+      }      
     }
 
     void loUAdapter_OnChatResponse(ChatResponse loUResponseChat)
@@ -67,6 +66,9 @@ namespace EEM.Plugin.Chat
         switch (message.Target)
         {
           // [{"C":"CHAT","D":[{"c":"global","s":"@Info","m":"Welcome"}]}"
+          // [{"C":"CHAT","D":[{"c":"social@ally","s":"A@System","m":"Your ally, Fuzzle, is now online."}]}]
+          // [{"C":"CHAT","D":[{"c":"@A","s":"CSkytap","m":"."}]}]
+          // [{"C":"CHAT","D":[{"c":"@A","s":"CKryllik","m":"wow iron/food nice"}]}]
           case "@A":
             WriteToChatBox(new StringBuilder().Append("[").Append(message.Who).Append("]: ").Append(message.Message).ToString(), Settings.Default.ColorOfAllianceText);
             break;
@@ -81,7 +83,11 @@ namespace EEM.Plugin.Chat
               WriteToChatBox(new StringBuilder().Append("[").Append(message.Who).Append("]: ").Append(message.Message).ToString(), Settings.Default.ColorOfContinentText);
             }
             break;
-      
+
+          case "@CCS":
+            WriteToChatBox(new StringBuilder().Append("[Server]: ").Append(message.Message).ToString(), Settings.Default.ColorOfSystemText);
+            break;      
+
           case "@CCC":
             WriteToChatBox(new StringBuilder().Append("[Server]: You are chatting with continents ").Append(message.Message).ToString(), Settings.Default.ColorOfSystemText);
             break;
@@ -96,6 +102,10 @@ namespace EEM.Plugin.Chat
       
           case "privateout":
             WriteToChatBox(new StringBuilder().Append("[You whisper ").Append(message.Who).Append("]: ").Append(message.Message).ToString(), Settings.Default.ColorOfWhisperText);
+            break;
+
+          case "social@ally":
+            WriteToChatBox(new StringBuilder().Append("[Server]: ").Append(message.Message).ToString(), Color.DimGray);
             break;
       
           default:
@@ -119,14 +129,33 @@ namespace EEM.Plugin.Chat
 
       using (var streamWriter = new StreamWriter(Settings.Default.ChatLogFile, true))
       {
-        StringBuilder stringBuilder = new StringBuilder("[")
-          .Append(DateTime.Now.ToString("F"))
-          .Append("] [chat] [")
-          .Append(message.Target)
-          .Append("] [")
-          .Append(message.Who)
-          .Append("] ")
-          .Append(message.Message);
+        var logformat = (ChatLogFormat) ConversionUtil.StringToEnum(typeof(ChatLogFormat), Settings.Default.ChatLogFormat);
+        var stringBuilder = new StringBuilder();
+        switch (logformat)
+        {
+          case ChatLogFormat.ApacheStyle:
+            
+            stringBuilder.Append("[")
+                         .Append(DateTime.Now.ToString("F"))
+                         .Append("] [chat] [")
+                         .Append(message.Target)
+                         .Append("] [")
+                         .Append(message.Who)
+                         .Append("] ")
+                         .Append(message.Message);
+            break;
+
+          case ChatLogFormat.CSV:
+            stringBuilder.Append(DateTime.Now.ToString("yyyy'-'MM'-'dd HH':'mm':'ss zzz"))
+                         .Append(",")
+                         .Append(message.Target)
+                         .Append(",")
+                         .Append(message.Who)
+                         .Append(",\"")
+                         .Append(message.Message.Replace('\"', '\''))
+                         .Append("\"");
+            break;
+        }
 
         streamWriter.WriteLine(stringBuilder);
       }
@@ -248,7 +277,6 @@ namespace EEM.Plugin.Chat
       SetInputTextColor();
 
       _enableLoggin = Settings.Default.EnableLogging;
-      _logFile = Settings.Default.ChatLogFile;
     }
 
     /// <summary>
@@ -340,7 +368,9 @@ namespace EEM.Plugin.Chat
       string input = inputbox.Text;
       inputbox.Text = String.Empty;
 
-      if (chattarget.Text == @"Alliance" && !input.StartsWith("/w"))
+      if (chattarget.Text == @"Alliance" && 
+          !input.StartsWith("/w") &&
+          !input.StartsWith("/c"))
       {
         input = "/a " + input;
       }
@@ -405,6 +435,35 @@ namespace EEM.Plugin.Chat
     // ReSharper restore InconsistentNaming
     {
       SetInputTextColor();
+    }
+
+    private void ChatScreenFormClosing(object sender, FormClosingEventArgs e)
+    {
+      _loUAdapter.PollingService.OnPollItemRemoval -= PollingService_OnPollItemRemoval;
+      _loUAdapter.OnChatResponse -= loUAdapter_OnChatResponse;
+      _loUAdapter.OnConnectionStateChange -= loUAdapter_OnConnectionStateChange;
+      _loUAdapter.PollingService.RemovePollRequestItem(PollRequestItems.CHAT);
+    }
+
+    private void ChatScreenLoad(object sender, EventArgs e)
+    {
+      _loUAdapter.OnChatResponse += loUAdapter_OnChatResponse;
+      _loUAdapter.OnConnectionStateChange += loUAdapter_OnConnectionStateChange;
+      _loUAdapter.PollingService.OnPollItemRemoval += PollingService_OnPollItemRemoval;
+      HandleConnectionState(_loUAdapter.ConnectionState);
+    }
+
+    /// <summary>
+    /// We want to check and see if Chat was removed.
+    /// </summary>
+    /// <param name="pollRequestItem"></param>
+    void PollingService_OnPollItemRemoval(PollRequestItems pollRequestItem)
+    {
+      if (pollRequestItem == PollRequestItems.CHAT)
+      {
+        PollRequestItems[] item = { PollRequestItems.CHAT };
+        _loUAdapter.PollingService.AddPollRequestItems(item, String.Empty);
+      }
     }
   }
 }

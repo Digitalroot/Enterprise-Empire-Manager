@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Windows.Forms;
+using EEM.Common.Exceptions;
 using EEM.Common.Protocol;
 using Newtonsoft.Json;
 
@@ -44,20 +45,15 @@ namespace EEM.Common.Adapters
     /// </summary>
     private static volatile LoUAdapter _instance;
 
-    /// <summary>
-    /// List of Poll request Id's
-    /// </summary>
-    private readonly List<int> _listOfPollIds = new List<int>();
+    private Hashtable _queuedCityLookupIds = new Hashtable();
 
-    /// <summary>
-    /// Poll timer
-    /// </summary>
-    private readonly Timer _polltimer = new Timer { Interval = 10000 };
+    private LoUAdapterDB _loUAdapterDB = new LoUAdapterDB();
 
-    /// <summary>
-    /// Items included in the poll request.
-    /// </summary>
-    private readonly Hashtable _pollRequestItems = new Hashtable();
+    public PollingService PollingService { get; private set; }
+
+    public TimeService TimeService { get; private set; }
+
+    public LoadingScreen LoadingScreen = new LoadingScreen();
 
     /// <summary>
     /// Adapter configuration
@@ -94,20 +90,32 @@ namespace EEM.Common.Adapters
         switch (value)
         {
           case ConnectionState.Connected:
-            StartPollTimer();
+            PollingService.StartPollTimer();
             break;
 
           case ConnectionState.Disconnected:
-            StopPollTimer();
+            PollingService.StopPollTimer();
             break;
         }
       }
     }
 
+    private City _currentCity;
+
     /// <summary>
     /// Current City - Some Actions can only be done from the current city.
     /// </summary>
-    public City CurrentCity { get; set; }
+    public City CurrentCity
+    {
+      get { return _currentCity; }
+      set
+      {
+        _currentCity = value;
+        CurrentCityChanged(value);
+      }
+    }
+
+    public Player CurrentPlayer { get; private set; }
 
     /// <summary>
     /// List of a players Cities
@@ -164,7 +172,7 @@ namespace EEM.Common.Adapters
     private string SessionId { get; set; }
 
     /// <summary>
-    /// Lock to make thread safe
+    /// Lock to make thread safe.
     /// </summary>
     private static readonly object SyncRoot = new Object();
 
@@ -175,6 +183,8 @@ namespace EEM.Common.Adapters
     /// </summary>
     private LoUAdapter(AdapterConfiguration loUAdapterConfiguration, NetworkCredential credentials)
     {
+      TimeService = new TimeService();
+      PollingService = new PollingService(TimeService);
       ConnectionState = ConnectionState.Disconnected;
       Credentials = credentials;
       MessageExchangeAdapter = MessageExchangeAdapter.Instance;
@@ -182,6 +192,7 @@ namespace EEM.Common.Adapters
       MessageExchangeAdapter.OnServerResponse += MessageExchangeAdapter_OnServerResponse;
       MessageExchangeAdapter.OnServerResponseToQueuedCommand += MessageExchangeAdapter_OnServerResponseToQueuedCommand;
       OnPlayerResponse += LoUAdapter_OnPlayerResponse;
+      OnSystemResponse += LoUAdapter_OnSystemResponse;
 
       Configuration = loUAdapterConfiguration;
       
@@ -193,7 +204,7 @@ namespace EEM.Common.Adapters
       System.Diagnostics.Debug.WriteLine(String.Format("email = {0}", credentials.UserName));
       System.Diagnostics.Debug.WriteLine(String.Format("pass = {0}", credentials.Password));
 
-      _polltimer.Tick += polltimer_Tick;
+      PollingService.Polltimer.Tick += polltimer_Tick;
 
       Cities = new List<City>();
     }
@@ -207,32 +218,6 @@ namespace EEM.Common.Adapters
 
     #endregion
 
-
-    /// <summary>
-    /// Adds a new value to the poll request items.
-    /// If the item already exists then update is called
-    /// </summary>
-    /// <param name="pollRequestItems"></param>
-    /// <param name="value"></param>
-    public void AddPollRequestItems(PollRequestItems[] pollRequestItems, string value)
-    {
-      foreach (PollRequestItems pollRequestItem in pollRequestItems)
-      {
-        if (_pollRequestItems.ContainsKey(pollRequestItem.ToString()))
-        {
-          UpdatePollRequestItem(pollRequestItem, value);
-        }
-        else
-        {
-          _pollRequestItems.Add(pollRequestItem.ToString(), value);  
-        }
-      }
-
-      if (!_polltimer.Enabled && _pollRequestItems.Count > 0)
-      {
-        StartPollTimer();
-      }
-    }
 
     /// <summary>
     /// Handles logging into LoU.
@@ -283,8 +268,14 @@ namespace EEM.Common.Adapters
       if (!String.IsNullOrEmpty(SessionId))
       {
         // open the Ajax session
-        result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.OpenSession, new JsonRequest(new { session = SessionId }));
-        if (result == "0")
+        OpenSessionResponse sessionInfo = OpenSession(SessionId);
+
+        if (sessionInfo != null)
+        {
+          SessionId = sessionInfo.SessionId;
+        }
+        
+        if (!String.IsNullOrEmpty(SessionId))
         {
           IsAuthenticated = true;
         }
@@ -328,6 +319,7 @@ namespace EEM.Common.Adapters
 
         if (playerInfo != null)
         {
+          CurrentPlayer = new Player(playerInfo);
           SetCities(playerInfo.Cities);
         }
 
@@ -473,8 +465,15 @@ namespace EEM.Common.Adapters
 
       switch (deserializeObject.C)
       {
+        case "ALL_AT":
+          ALLATResponse(JsonConvert.DeserializeObject<ALLATResponse>(response.ToString()));
+          break;
+
         case "ALLIANCE":
           //AllianceResponse(JsonConvert.DeserializeObject<AllianceResponse>(response.ToString()));
+          break;
+
+        case "CAT": // Do Nothing
           break;
 
         case "CHAT":
@@ -486,6 +485,9 @@ namespace EEM.Common.Adapters
           break;
 
         case "FRIENDINV": // Do Nothing
+          break;
+
+        case "INV": // Do nothing
           break;
 
         case "MAIL": // Do Nothing
@@ -505,8 +507,15 @@ namespace EEM.Common.Adapters
         case "SERVER": // Do Nothing
           break;
 
+        case "SUBSTITUTION": // Do nothing
+          break;
+
         case "SYS":
           SystemResponse(JsonConvert.DeserializeObject<SysResponse>(response.ToString()));
+          break;
+
+        case "TIME": // TIME
+          TimeService.Update(JsonConvert.DeserializeObject<TimeResponse>(response.ToString()));
           break;
 
         case "VERSION":
@@ -523,26 +532,10 @@ namespace EEM.Common.Adapters
     }
 
     /// <summary>
-    /// Removes a poll request item.
-    /// </summary>
-    /// <param name="pollRequestItem"></param>
-    public void RemovePollRequestItem(PollRequestItems pollRequestItem)
-    {
-      if (_pollRequestItems.ContainsKey(pollRequestItem.ToString()))
-      {
-        _pollRequestItems.Remove(pollRequestItem);
-      }
-      if (_polltimer.Enabled && _pollRequestItems.Count == 0)
-      {
-        StopPollTimer();
-      }
-    }
-
-    /// <summary>
     /// Populates the list of cities. 
     /// </summary>
     /// <param name="cities"></param>
-    private void SetCities(List<CityResponse> cities)
+    private void SetCities(List<CityResponseToBeFixed> cities)
     {
       if (Cities.Count != cities.Count)
       {
@@ -551,9 +544,23 @@ namespace EEM.Common.Adapters
           Cities.Clear();
           CurrentCity = null;
         }
-        foreach (CityResponse city in cities)
+
+        MessageExchangeAdapter.OnServerResponseToQueuedCommand += City_OnServerResponseToQueuedCommand;
+
+        // Queue city look up
+        foreach (CityResponseToBeFixed city in cities)
         {
-          Cities.Add(new City(city));
+          City dbCity = _loUAdapterDB.Load(city.Id);
+
+          if (dbCity == null)
+          {
+            // Load from LoU
+            _queuedCityLookupIds.Add(QueueGetPublicCityInfo(city.Id), city.Id);
+          }
+          else
+          {
+            Cities.Add(dbCity);
+          }
         }
       }
 
@@ -563,18 +570,38 @@ namespace EEM.Common.Adapters
       }
     }
 
-    /// <summary>
-    /// Starts the Poll timer.
-    /// </summary>
-    private void StartPollTimer()
+    private void City_OnServerResponseToQueuedCommand(int id, string message)
     {
-      if (ConnectionState == ConnectionState.Connected &&
-          _pollRequestItems.Count > 0 &&
-          !_polltimer.Enabled)
+      if (_queuedCityLookupIds.Count > 0 && !LoadingScreen.Visible)
       {
-        _polltimer.Start();
+        LoadingScreen.labelLoadingInfo.Text = "Loading City Info.";
+        LoadingScreen.progressBarLoading.Step = 1;
+        LoadingScreen.progressBarLoading.Maximum = _queuedCityLookupIds.Count;
+        LoadingScreen.progressBarLoading.Value = 0;
+        LoadingScreen.Show();
+        LoadingScreen.Refresh();
+      }
+
+      if (LoadingScreen.Visible)
+      {
+        LoadingScreen.progressBarLoading.PerformStep();
+      }
+
+      if (_queuedCityLookupIds.ContainsKey(id))
+      {
+        var newCity = new City(JsonConvert.DeserializeObject<GetPublicCityInfoResponse>(message), (int) _queuedCityLookupIds[id]);
+        _queuedCityLookupIds.Remove(id);
+        Cities.Add(newCity);
+        _loUAdapterDB.Save(newCity);
+      }
+
+      if (_queuedCityLookupIds.Count == 0)
+      {
+        LoadingScreen.Hide();
+        MessageExchangeAdapter.OnServerResponseToQueuedCommand -= City_OnServerResponseToQueuedCommand;
       }
     }
+
 
     /// <summary>
     /// Sets the login username and password.
@@ -586,36 +613,5 @@ namespace EEM.Common.Adapters
       System.Diagnostics.Debug.WriteLine(String.Format("email = {0}", credential.UserName));
       System.Diagnostics.Debug.WriteLine(String.Format("pass = {0}", credential.Password));
     }
-
-    /// <summary>
-    /// Stops the Poll timer
-    /// </summary>
-    private void StopPollTimer()
-    {
-      if (_polltimer.Enabled)
-      {
-        _polltimer.Stop();
-      }
-    }
-
-    /// <summary>
-    /// Updates a value on the poll request items.
-    /// if the item does not exist then it is added.
-    /// </summary>
-    /// <param name="pollRequestItem"></param>
-    /// <param name="value"></param>
-    public void UpdatePollRequestItem(PollRequestItems pollRequestItem, string value)
-    {
-      if (_pollRequestItems.ContainsKey(pollRequestItem.ToString()))
-      {
-        _pollRequestItems[pollRequestItem.ToString()] = value;
-      }
-      else
-      {
-        PollRequestItems[] item = { pollRequestItem };
-        AddPollRequestItems(item, value);
-      }
-    }
-
   }
 }

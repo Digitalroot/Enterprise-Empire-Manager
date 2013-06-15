@@ -7,6 +7,27 @@ namespace EEM.Common.Adapters
   public partial class LoUAdapter
   {
 
+    public delegate void ALLATResponseHandler(ALLATResponse response);
+    public event ALLATResponseHandler OnALLATResponse;
+    private void ALLATResponse(ALLATResponse response)
+    {
+      if (OnALLATResponse != null)
+      {
+        Delegate[] subscribers = OnALLATResponse.GetInvocationList();
+        foreach (ALLATResponseHandler subscriber in subscribers)
+        {
+          try
+          {
+            subscriber(response);
+          }
+          catch (Exception e)
+          {
+            HandleDelegateError(subscriber.Method, e);
+          }
+        }
+      }
+    }
+
     public delegate void AllianceResponseHandler(AllianceResponse response);
     public event AllianceResponseHandler OnAllianceResponse;
     private void AllianceResponse(AllianceResponse response)
@@ -91,10 +112,32 @@ namespace EEM.Common.Adapters
       }
     }
 
+    public delegate void CurrentCityChangeHandler(City newCity);
+    public event CurrentCityChangeHandler OnCurrentCityChange;
+    private void CurrentCityChanged(City newCity)
+    {
+      if (OnCurrentCityChange != null && newCity != null)
+      {
+        Delegate[] subscribers = OnCurrentCityChange.GetInvocationList();
+        foreach (CurrentCityChangeHandler subscriber in subscribers)
+        {
+          try
+          {
+            subscriber(newCity);
+          }
+          catch (Exception e)
+          {
+            HandleDelegateError(subscriber.Method, e);
+          }
+        }
+      }
+    }
+
     public delegate void ConnectionStateChangeHandler(ConnectionState state);
     public event ConnectionStateChangeHandler OnConnectionStateChange;
     private void ConnectionStateChanged(ConnectionState state)
     {
+      PollingService.ConnectionState = state;
       if (OnConnectionStateChange != null)
       {
         Delegate[] subscribers = OnConnectionStateChange.GetInvocationList();
@@ -153,7 +196,28 @@ namespace EEM.Common.Adapters
         }
       }
     }
-    
+
+    public delegate void ServerRequestHandler(string url, JsonRequest json);
+    public event ServerRequestHandler OnServerRequest;
+    private void ServerRequestMade(string url, JsonRequest json)
+    {
+      if (OnServerRequest != null)
+      {
+        Delegate[] subscribers = OnServerRequest.GetInvocationList();
+        foreach (ServerRequestHandler subscriber in subscribers)
+        {
+          try
+          {
+            subscriber(url, json);
+          }
+          catch (Exception e)
+          {
+            HandleDelegateError(subscriber.Method, e);
+          }
+        }
+      }
+    }
+
     public delegate void ServerResponseHandler(string message);
     public event ServerResponseHandler OnServerResponse;
     private void ServerResponded(string message)
