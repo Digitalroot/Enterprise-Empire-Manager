@@ -1,1 +1,0 @@
-﻿Place Plug-ins in this directory.
