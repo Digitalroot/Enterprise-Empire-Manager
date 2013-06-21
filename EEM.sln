@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Enterprise Empire Manager", "Enterprise Empire Manager\Enterprise Empire Manager.csproj", "{A2D8FB85-73D0-4C62-9640-299F3BF545EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NRTFTree", "NRTFTree\NRTFTree.csproj", "{1CBC8BC2-6958-4FEF-8DC9-56834645FC31}"
@@ -49,8 +49,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications", "Plug-ins\Notifications\Notifications.csproj", "{91764BD4-6350-4CCB-A45B-0D958EA98989}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonLogger", "Plug-ins\JsonViewer\JsonLogger.csproj", "{D32F3F5C-77C8-4BB1-848D-534C52A2BBB0}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "EEM_Installer_x86", "EEM_Installer_x86\EEM_Installer_x86.vdproj", "{484AE149-B2D7-4959-A4DD-9E6D35AFDAD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -153,10 +151,6 @@ Global
 		{D32F3F5C-77C8-4BB1-848D-534C52A2BBB0}.Release|x64.Build.0 = Release|x64
 		{D32F3F5C-77C8-4BB1-848D-534C52A2BBB0}.Release|x86.ActiveCfg = Release|x86
 		{D32F3F5C-77C8-4BB1-848D-534C52A2BBB0}.Release|x86.Build.0 = Release|x86
-		{484AE149-B2D7-4959-A4DD-9E6D35AFDAD0}.Debug|x64.ActiveCfg = Debug
-		{484AE149-B2D7-4959-A4DD-9E6D35AFDAD0}.Debug|x86.ActiveCfg = Debug
-		{484AE149-B2D7-4959-A4DD-9E6D35AFDAD0}.Release|x64.ActiveCfg = Release
-		{484AE149-B2D7-4959-A4DD-9E6D35AFDAD0}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

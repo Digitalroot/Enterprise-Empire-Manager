@@ -19,7 +19,7 @@
     <call target="Build_x86"/>
 
     <!-- Build x64 - Disabled for now -->
-    <!-- call target="Build_x64"/ -->
+    <call target="Build_x64"/>
 
     <!-- Build Extras -->
     <fail if="${not property::exists('dir.extras')}" message="Missing dir.extras value." />
@@ -43,10 +43,10 @@
 
     <!-- Build x86 MSI -->
     <echo message="Building x86 Installer" />
-    <exec program="C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" commandline='"EEM.sln" /build Release /project "EEM_Installer_x86"'/>    
+    <!-- exec program="C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" commandline='"EEM.sln" /build Release /project "EEM_Installer_x86"'/ -->
     
     <zip zipfile="${dir.build}\..\..\Enterprise Empire Manager ${build.platform} ${assembly.version}.zip" verbose="True">
-      <fileset basedir="${dir.installer}">
+      <fileset basedir="${dir.build}"> <!-- ${dir.installer} -->
         <include name="**/*" />
       </fileset>
     </zip>
@@ -66,7 +66,7 @@
 
     <!-- Build x64 MSI -->
     <echo message="Building x64 Installer" />
-    <exec program="C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" commandline='"EEM.sln" /build Release /project "EEM_Installer_x64"'/>
+    <!-- exec program="C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" commandline='"EEM.sln" /build Release /project "EEM_Installer_x64"'/ -->
   
   </target>
 

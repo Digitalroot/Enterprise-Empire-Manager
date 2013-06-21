@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -12,51 +13,97 @@ using Newtonsoft.Json;
 namespace EEM.Common.Adapters
 {
   /// <remarks>
-  /// This class is the interface that other code should use to 
-  /// get data about LoU. This class looks in the Protocol for how to make a request. 
-  /// Sends it to the JsonWebClient. Then uses the Protocol for how to interpret a response.
-  /// 
-  /// Request:
-  /// [Other Code] -> [LoUAdapter + Protocols] -> [MessageExchangeAdapter] -> [JsonWebClient] -> [LoU Server]
-  /// 
-  /// Response:
-  /// [LoU Server] -> [JsonWebClient] -> [MessageExchangeAdapter] -> [LoUAdapter + Protocols] -> [Other Code]
-  /// 
-  /// Example: 
+  ///   This class is the interface that other code should use to
+  ///   get data about LoU. This class looks in the Protocol for how to make a request.
+  ///   Sends it to the JsonWebClient. Then uses the Protocol for how to interpret a response.
+  ///   Request:
+  ///   [Other Code] -> [LoUAdapter + Protocols] -> [MessageExchangeAdapter] -> [JsonWebClient] -> [LoU Server]
+  ///   Response:
+  ///   [LoU Server] -> [JsonWebClient] -> [MessageExchangeAdapter] -> [LoUAdapter + Protocols] -> [Other Code]
+  ///   Example:
   ///   var louClient = new LoUClient();
   ///   var currentWood = louClient.GetWood();
-  ///   
   ///   GetWood() = return louGameServerQuerier.QueryUrlAsAJAXRequest("/Presentation/Service.svc/ajaxEndpoint/Poll", "{w,0}");
   /// </remarks>
   public sealed partial class LoUAdapter : ILoUAdapter
   {
     /// <summary>
-    /// Adapter configuration
-    /// </summary>
-    private AdapterConfiguration _configuration;
-
-    /// <summary>
-    /// Current Connection State.
-    /// </summary>
-    private ConnectionState _connectionState;
-
-    /// <summary>
-    /// Singleton Instance
+    ///   Singleton Instance
     /// </summary>
     private static volatile LoUAdapter _instance;
 
-    private Hashtable _queuedCityLookupIds = new Hashtable();
+    /// <summary>
+    ///   Lock to make thread safe.
+    /// </summary>
+    private static readonly object SyncRoot = new Object();
 
-    private LoUAdapterDB _loUAdapterDB = new LoUAdapterDB();
+    #region Constructors
 
-    public PollingService PollingService { get; private set; }
+    /// <summary>
+    ///   Constructor
+    /// </summary>
+    private LoUAdapter(AdapterConfiguration loUAdapterConfiguration, NetworkCredential credentials)
+    {
+      TimeService = new TimeService();
+      PollingService = new PollingService(TimeService);
+      ConnectionState = ConnectionState.Disconnected;
+      Credentials = credentials;
+      MessageExchangeAdapter = MessageExchangeAdapter.Instance;
+      MessageExchangeAdapter.OnServerRequest += MessageExchangeAdapter_OnServerRequest;
+      MessageExchangeAdapter.OnServerResponse += MessageExchangeAdapter_OnServerResponse;
+      MessageExchangeAdapter.OnServerResponseToQueuedCommand += MessageExchangeAdapter_OnServerResponseToQueuedCommand;
+      OnPlayerResponse += LoUAdapter_OnPlayerResponse;
+      OnSystemResponse += LoUAdapter_OnSystemResponse;
 
-    public TimeService TimeService { get; private set; }
+      Configuration = loUAdapterConfiguration;
+
+      Debug.WriteLine("Configuration:");
+      Debug.WriteLine("AuthenticationUrl = {0}", loUAdapterConfiguration.AuthenticationUrl);
+      Debug.WriteLine("GameServerUrl = {0}", loUAdapterConfiguration.GameServerUrl);
+      Debug.WriteLine("HomePageUrl = {0}", loUAdapterConfiguration.HomePageUrl);
+      Debug.WriteLine("SessionUrl = {0}", loUAdapterConfiguration.SessionUrl);
+      Debug.WriteLine("email = {0}", credentials.UserName);
+      Debug.WriteLine("pass = {0}", credentials.Password);
+
+      PollingService.Polltimer.Tick += polltimer_Tick;
+
+      Cities = new List<City>();
+    }
+
+    /// <summary>
+    ///   Constructor
+    /// </summary>
+    private LoUAdapter()
+      : this(new AdapterConfiguration(), new NetworkCredential())
+    {
+    }
+
+    #endregion
+
+    /// <summary>
+    ///   Adapter used to pass commands to the LoU servers.
+    /// </summary>
+    internal readonly MessageExchangeAdapter MessageExchangeAdapter;
+
+    private readonly LoUAdapterDB _loUAdapterDb = new LoUAdapterDB();
+    private readonly Hashtable _queuedCityLookupIds = new Hashtable();
 
     public LoadingScreen LoadingScreen = new LoadingScreen();
 
     /// <summary>
-    /// Adapter configuration
+    ///   Adapter configuration
+    /// </summary>
+    private AdapterConfiguration _configuration;
+
+    /// <summary>
+    ///   Current Connection State.
+    /// </summary>
+    private ConnectionState _connectionState;
+
+    private City _currentCity;
+
+    /// <summary>
+    ///   Adapter configuration
     /// </summary>
     public AdapterConfiguration Configuration
     {
@@ -65,16 +112,66 @@ namespace EEM.Common.Adapters
       {
         _configuration = value;
         MessageExchangeAdapter.Configuration = value;
-        System.Diagnostics.Debug.WriteLine("Configuration:");
-        System.Diagnostics.Debug.WriteLine(String.Format("AuthenticationUrl = {0}", value.AuthenticationUrl));
-        System.Diagnostics.Debug.WriteLine(String.Format("GameServerUrl = {0}", value.GameServerUrl));
-        System.Diagnostics.Debug.WriteLine(String.Format("HomePageUrl = {0}", value.HomePageUrl));
-        System.Diagnostics.Debug.WriteLine(String.Format("SessionUrl = {0}", value.SessionUrl));
+        Debug.WriteLine("Configuration:");
+        Debug.WriteLine("AuthenticationUrl = {0}", value.AuthenticationUrl);
+        Debug.WriteLine("GameServerUrl = {0}", value.GameServerUrl);
+        Debug.WriteLine("HomePageUrl = {0}", value.HomePageUrl);
+        Debug.WriteLine("SessionUrl = {0}", value.SessionUrl);
+      }
+    }
+
+    public Player CurrentPlayer { get; private set; }
+
+    /// <summary>
+    ///   Username and password for logging into LoU.
+    /// </summary>
+    private NetworkCredential Credentials { get; set; }
+
+    /// <summary>
+    ///   Singleton
+    /// </summary>
+    public static LoUAdapter Instance
+    {
+      get
+      {
+        if (_instance == null)
+        {
+          lock (SyncRoot)
+          {
+            if (_instance == null)
+              _instance = new LoUAdapter();
+          }
+        }
+        return _instance;
       }
     }
 
     /// <summary>
-    /// Current Connection State.
+    ///   True once we log into LoU
+    /// </summary>
+    private bool IsAuthenticated { get; set; }
+
+    /// <summary>
+    ///   Request Counter.
+    /// </summary>
+    private int RequestCount { get; set; }
+
+    /// <summary>
+    ///   Name of the server we are connected to.
+    /// </summary>
+    public string ServerName { get; private set; }
+
+    /// <summary>
+    ///   Current Session Id
+    /// </summary>
+    private string SessionId { get; set; }
+
+    public PollingService PollingService { get; private set; }
+
+    public TimeService TimeService { get; private set; }
+
+    /// <summary>
+    ///   Current Connection State.
     /// </summary>
     public ConnectionState ConnectionState
     {
@@ -100,10 +197,8 @@ namespace EEM.Common.Adapters
       }
     }
 
-    private City _currentCity;
-
     /// <summary>
-    /// Current City - Some Actions can only be done from the current city.
+    ///   Current City - Some Actions can only be done from the current city.
     /// </summary>
     public City CurrentCity
     {
@@ -115,124 +210,26 @@ namespace EEM.Common.Adapters
       }
     }
 
-    public Player CurrentPlayer { get; private set; }
-
     /// <summary>
-    /// List of a players Cities
+    ///   List of a players Cities
     /// </summary>
     public List<City> Cities { get; private set; }
 
     /// <summary>
-    /// Username and password for logging into LoU.
-    /// </summary>
-    private NetworkCredential Credentials { get; set; }
-
-    /// <summary>
-    /// Singleton
-    /// </summary>
-    public static LoUAdapter Instance
-    {
-      get
-      {
-        if (_instance == null)
-        {
-          lock (SyncRoot)
-          {
-            if (_instance == null)
-              _instance = new LoUAdapter();
-          }
-        }
-        return _instance;
-      }
-    }
-
-    /// <summary>
-    /// True once we log into LoU
-    /// </summary>
-    private bool IsAuthenticated { get; set; }
-
-    /// <summary>
-    /// Adapter used to pass commands to the LoU servers.
-    /// </summary>
-    internal readonly MessageExchangeAdapter MessageExchangeAdapter;
-
-    /// <summary>
-    /// Request Counter.
-    /// </summary>
-    private int RequestCount { get; set; }
-
-    /// <summary>
-    /// Name of the server we are connected to.
-    /// </summary>
-    public string ServerName { get; private set; }
-
-    /// <summary>
-    /// Current Session Id
-    /// </summary>
-    private string SessionId { get; set; }
-
-    /// <summary>
-    /// Lock to make thread safe.
-    /// </summary>
-    private static readonly object SyncRoot = new Object();
-
-    #region Constructors
-
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    private LoUAdapter(AdapterConfiguration loUAdapterConfiguration, NetworkCredential credentials)
-    {
-      TimeService = new TimeService();
-      PollingService = new PollingService(TimeService);
-      ConnectionState = ConnectionState.Disconnected;
-      Credentials = credentials;
-      MessageExchangeAdapter = MessageExchangeAdapter.Instance;
-      MessageExchangeAdapter.OnServerRequest  += MessageExchangeAdapter_OnServerRequest;
-      MessageExchangeAdapter.OnServerResponse += MessageExchangeAdapter_OnServerResponse;
-      MessageExchangeAdapter.OnServerResponseToQueuedCommand += MessageExchangeAdapter_OnServerResponseToQueuedCommand;
-      OnPlayerResponse += LoUAdapter_OnPlayerResponse;
-      OnSystemResponse += LoUAdapter_OnSystemResponse;
-
-      Configuration = loUAdapterConfiguration;
-      
-      System.Diagnostics.Debug.WriteLine("Configuration:");
-      System.Diagnostics.Debug.WriteLine(String.Format("AuthenticationUrl = {0}", loUAdapterConfiguration.AuthenticationUrl));
-      System.Diagnostics.Debug.WriteLine(String.Format("GameServerUrl = {0}", loUAdapterConfiguration.GameServerUrl));
-      System.Diagnostics.Debug.WriteLine(String.Format("HomePageUrl = {0}", loUAdapterConfiguration.HomePageUrl));
-      System.Diagnostics.Debug.WriteLine(String.Format("SessionUrl = {0}", loUAdapterConfiguration.SessionUrl));
-      System.Diagnostics.Debug.WriteLine(String.Format("email = {0}", credentials.UserName));
-      System.Diagnostics.Debug.WriteLine(String.Format("pass = {0}", credentials.Password));
-
-      PollingService.Polltimer.Tick += polltimer_Tick;
-
-      Cities = new List<City>();
-    }
-
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    private LoUAdapter()
-      : this(new AdapterConfiguration(), new NetworkCredential())
-    {}
-
-    #endregion
-
-
-    /// <summary>
-    /// Handles logging into LoU.
+    ///   Handles logging into LoU.
     /// </summary>
     /// <returns>True if we log into LoU</returns>
     private bool Authenticate()
     {
-      if (Credentials == null || string.IsNullOrEmpty(Credentials.UserName) || string.IsNullOrEmpty(Credentials.Password))
+      if (Credentials == null || string.IsNullOrEmpty(Credentials.UserName) ||
+          string.IsNullOrEmpty(Credentials.Password))
       {
         AuthenticationFailed(new ArrayList {"MISSING_USERNAME_OR_PASSWORD"});
         IsAuthenticated = false;
       }
 
       // Load LoU Home Page to get Cookies
-      var result = MessageExchangeAdapter.GetHomePage();
+      string result = MessageExchangeAdapter.GetHomePage();
 
       // Check if we find the session id in the home page. 
       SessionId = GetSessionId(result);
@@ -274,7 +271,7 @@ namespace EEM.Common.Adapters
         {
           SessionId = sessionInfo.SessionId;
         }
-        
+
         if (!String.IsNullOrEmpty(SessionId))
         {
           IsAuthenticated = true;
@@ -285,7 +282,7 @@ namespace EEM.Common.Adapters
     }
 
     /// <summary>
-    /// Raises the onError Event for not being connected.
+    ///   Raises the onError Event for not being connected.
     /// </summary>
     /// <returns>Returns true if we are connected.</returns>
     private void ErrorIfNotConnected()
@@ -297,7 +294,7 @@ namespace EEM.Common.Adapters
     }
 
     /// <summary>
-    /// External Method used to have the LoUAdapter try and connect to LoU.
+    ///   External Method used to have the LoUAdapter try and connect to LoU.
     /// </summary>
     public void Connect()
     {
@@ -328,7 +325,7 @@ namespace EEM.Common.Adapters
     }
 
     /// <summary>
-    /// External Method is have the LoUAdapter Disconnect.
+    ///   External Method is have the LoUAdapter Disconnect.
     /// </summary>
     public void Disconnect()
     {
@@ -345,7 +342,7 @@ namespace EEM.Common.Adapters
     }
 
     /// <summary>
-    /// Reads the Html code returned by the server to find the error messages.
+    ///   Reads the Html code returned by the server to find the error messages.
     /// </summary>
     /// <param name="htmlCode"></param>
     /// <returns></returns>
@@ -385,7 +382,7 @@ namespace EEM.Common.Adapters
     }
 
     /// <summary>
-    /// Gets the game page for the server after logging in.
+    ///   Gets the game page for the server after logging in.
     /// </summary>
     /// <returns></returns>
     private string GetGamePage()
@@ -394,7 +391,7 @@ namespace EEM.Common.Adapters
     }
 
     /// <summary>
-    /// Uses the louGameServerQuerier to Query the LoU Home Page.
+    ///   Uses the louGameServerQuerier to Query the LoU Home Page.
     /// </summary>
     /// <returns></returns>
     private string GetHomePage()
@@ -403,14 +400,15 @@ namespace EEM.Common.Adapters
     }
 
     /// <summary>
-    /// Reads the html and pulls the session id out of it. 
+    ///   Reads the html and pulls the session id out of it.
     /// </summary>
     /// <returns>A Session Id</returns>
     private static string GetSessionId(string result)
     {
-      if (!result.Contains("index.aspx?sessionId=") && !result.Contains("SessionId = \"") && !result.Contains("<input type=\"hidden\" name=\"sessionId\" id=\"sessionId\" value=\""))
+      if (!result.Contains("index.aspx?sessionId=") && !result.Contains("SessionId = \"") &&
+          !result.Contains("<input type=\"hidden\" name=\"sessionId\" id=\"sessionId\" value=\""))
       {
-        System.Diagnostics.Debug.WriteLine(String.Format("Unable to find (index.aspx?sessionId=) or (SessionId = \") in last HtmlResult."));
+        Debug.WriteLine("Unable to find (index.aspx?sessionId=) or (SessionId = \") in last HtmlResult.");
         return null;
       }
 
@@ -419,26 +417,28 @@ namespace EEM.Common.Adapters
       string sessionId = null;
       while ((line = reader.ReadLine()) != null)
       {
-        if (!line.Contains("?sessionId=") && !line.Contains("SessionId = \"") && !result.Contains("<input type=\"hidden\" name=\"sessionId\" id=\"sessionId\" value=\"")) continue;
+        if (!line.Contains("?sessionId=") && !line.Contains("SessionId = \"") &&
+            !result.Contains("<input type=\"hidden\" name=\"sessionId\" id=\"sessionId\" value=\"")) continue;
 
         if (line.Contains("?sessionId="))
         {
-          sessionId = line.Substring(line.IndexOf("?sessionId=") + 11, 36);
-          System.Diagnostics.Debug.WriteLine("Test: {0}, Session Id found in HTML. Line: {1}", "LoUCloent.GetSessionId", line);
+          sessionId = line.Substring(line.IndexOf("?sessionId=", StringComparison.Ordinal) + 11, 36);
+          Debug.WriteLine("Test: {0}, Session Id found in HTML. Line: {1}", "LoUCloent.GetSessionId", line);
           break;
         }
 
         if (line.Contains("SessionId = \""))
         {
-          sessionId = line.Substring(line.IndexOf("SessionId = \"") + 13, 36);
-          System.Diagnostics.Debug.WriteLine("Test: {0}, Session Id found in HTML. Line: {1}", "LoUCloent.GetSessionId", line);
+          sessionId = line.Substring(line.IndexOf("SessionId = \"", StringComparison.Ordinal) + 13, 36);
+          Debug.WriteLine("Test: {0}, Session Id found in HTML. Line: {1}", "LoUCloent.GetSessionId", line);
           break;
         }
 
         if (line.Contains("<input type=\"hidden\" name=\"sessionId\" id=\"sessionId\" value=\""))
         {
-          sessionId = line.Substring(line.IndexOf("<input type=\"hidden\" name=\"sessionId\" id=\"sessionId\" value=\"") + 60, 36);
-          System.Diagnostics.Debug.WriteLine("Test: {0}, Session Id found in HTML. Line: {1}", "LoUCloent.GetSessionId", line);
+          sessionId =
+            line.Substring(line.IndexOf("<input type=\"hidden\" name=\"sessionId\" id=\"sessionId\" value=\"", StringComparison.Ordinal) + 60, 36);
+          Debug.WriteLine("Test: {0}, Session Id found in HTML. Line: {1}", "LoUCloent.GetSessionId", line);
           break;
         }
       }
@@ -446,7 +446,7 @@ namespace EEM.Common.Adapters
     }
 
     /// <summary>
-    /// Handles Errors from Delegates.
+    ///   Handles Errors from Delegates.
     /// </summary>
     /// <param name="method"></param>
     /// <param name="exception"></param>
@@ -456,7 +456,7 @@ namespace EEM.Common.Adapters
     }
 
     /// <summary>
-    /// Handles the Response from the LoU Server.
+    ///   Handles the Response from the LoU Server.
     /// </summary>
     /// <param name="response"></param>
     private void HandlePollResponse(object response)
@@ -526,13 +526,13 @@ namespace EEM.Common.Adapters
           break;
 
         default:
-          System.Diagnostics.Debug.WriteLine(String.Format("Unknown Response: {0}", response));
+          Debug.WriteLine("Unknown Response: {0}", response);
           break;
       }
     }
 
     /// <summary>
-    /// Populates the list of cities. 
+    ///   Populates the list of cities.
     /// </summary>
     /// <param name="cities"></param>
     private void SetCities(List<CityResponseToBeFixed> cities)
@@ -550,7 +550,7 @@ namespace EEM.Common.Adapters
         // Queue city look up
         foreach (CityResponseToBeFixed city in cities)
         {
-          City dbCity = _loUAdapterDB.Load(city.Id);
+          City dbCity = _loUAdapterDb.Load(city.Id);
 
           if (dbCity == null)
           {
@@ -589,10 +589,11 @@ namespace EEM.Common.Adapters
 
       if (_queuedCityLookupIds.ContainsKey(id))
       {
-        var newCity = new City(JsonConvert.DeserializeObject<GetPublicCityInfoResponse>(message), (int) _queuedCityLookupIds[id]);
+        var newCity = new City(JsonConvert.DeserializeObject<GetPublicCityInfoResponse>(message),
+                               (int) _queuedCityLookupIds[id]);
         _queuedCityLookupIds.Remove(id);
         Cities.Add(newCity);
-        _loUAdapterDB.Save(newCity);
+        _loUAdapterDb.Save(newCity);
       }
 
       if (_queuedCityLookupIds.Count == 0)
@@ -604,14 +605,14 @@ namespace EEM.Common.Adapters
 
 
     /// <summary>
-    /// Sets the login username and password.
+    ///   Sets the login username and password.
     /// </summary>
     /// <param name="credential"></param>
     public void SetCredentials(NetworkCredential credential)
     {
       Credentials = credential;
-      System.Diagnostics.Debug.WriteLine(String.Format("email = {0}", credential.UserName));
-      System.Diagnostics.Debug.WriteLine(String.Format("pass = {0}", credential.Password));
+      Debug.WriteLine("email = {0}", credential.UserName);
+      Debug.WriteLine("pass = {0}", credential.Password);
     }
   }
 }
