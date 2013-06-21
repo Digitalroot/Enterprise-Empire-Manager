@@ -43,7 +43,7 @@
 
     <!-- Build x86 MSI -->
     <echo message="Building x86 Installer" />
-    <exec program="C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" commandline='"EEM.sln" /build Release /project "EEM_Installer_x86"'/>
+    <!-- exec program="C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" commandline='"EEM.sln" /build Release /project "EEM_Installer_x86"'/ -->
     
     <zip zipfile="${dir.build}\..\..\Enterprise Empire Manager ${build.platform} ${assembly.version}.zip" verbose="True">
       <fileset basedir="${dir.build}"> <!-- ${dir.installer} -->
