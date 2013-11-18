@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Windows.Forms;
 using EEM.Common.Adapters;
+using EEM.Common.Contracts;
 using EEM.Common.Exceptions;
-using EEM.Common.PluginInterface;
 
 namespace EEM.Plugin.RawInput
 {
   public partial class RawInputScreen : Form
   {
     private IEnterpriseEmpireManager EnterpriseEmpireManager { get; set; }
-    private LoUAdapter LoUAdapter { get; set; }
+    private ILoUAdapter LoUAdapter { get; set; }
     public string RawInput { get; private set; }
     public string Url { get; private set; }
 
@@ -17,7 +17,7 @@ namespace EEM.Plugin.RawInput
     {
       InitializeComponent();
       EnterpriseEmpireManager = enterpriseEmpireManager;
-      LoUAdapter = EnterpriseEmpireManager.LoUAdapter as LoUAdapter;
+      LoUAdapter = EnterpriseEmpireManager.LoUAdapter;
     }
 
     private void SendButton_Click(object sender, EventArgs e)
@@ -27,7 +27,7 @@ namespace EEM.Plugin.RawInput
 
       try
       {
-        ResultBox.Text = LoUAdapter.SendRawJson(RawInput, Url);
+        ResultBox.Text = ((LoUAdapter)LoUAdapter).SendRawJson(RawInput, Url);
       }
       catch (NotConnected)
       {

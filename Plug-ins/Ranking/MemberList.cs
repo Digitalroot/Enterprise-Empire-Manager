@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using EEM.Common.Adapters;
+using EEM.Common.Contracts;
 using EEM.Common.Protocol;
 
 namespace EEM.Plugin.Ranking
@@ -12,7 +12,7 @@ namespace EEM.Plugin.Ranking
   {
     private ILoUAdapter LoUAdapter { get; set; }
     private int AllianceId { get; set; }
-    private List<GetPublicAllianceMemberListResponse> ListResponses { get; set; }
+    private List<IGetPublicAllianceMemberListResponse> ListResponses { get; set; }
 
     public MemberList(ILoUAdapter loUAdapter, int allianceId)
     {

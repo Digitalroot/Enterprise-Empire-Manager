@@ -1,7 +1,8 @@
 using System;
 using System.IO;
 using System.Reflection;
-using EEM.Common.PluginInterface;
+using EEM.Common.Contracts;
+using EEM.Plugins.Common.Contracts;
 
 namespace EEM 
 {
@@ -109,7 +110,7 @@ namespace EEM
           if (!pluginType.IsAbstract)  //Only look at non-abstract types
           {
             //Gets a type object of the interface we need the plug-ins to match
-            Type typeInterface = pluginType.GetInterface("EEM.Common.PluginInterface.IPlugin", true);
+            Type typeInterface = pluginType.GetInterface("EEM.Plugins.Common.Contracts.IPlugin", true);
             
             //Make sure the interface we want to use actually exists
             if (typeInterface != null)

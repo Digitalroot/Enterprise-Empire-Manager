@@ -2,7 +2,9 @@
 using System.Reflection;
 using System.Windows.Forms;
 using EEM.Common;
-using EEM.Common.PluginInterface;
+using EEM.Common.Adapters;
+using EEM.Common.Contracts;
+using EEM.Plugins.Common.Contracts;
 
 namespace EEM.Plugin.Ranking
 {
@@ -55,7 +57,7 @@ namespace EEM.Plugin.Ranking
     {
       _enterpriseEmpireManager = enterpriseEmpireManager;
       _enterpriseEmpireManager.AddMenuItem(EEMMenuItems.View, _myPluginViewMenuItem);
-      _enterpriseEmpireManager.LoUAdapter.OnConnectionStateChange += LoUAdapter_OnConnectionStateChange;
+      ((LoUAdapter)_enterpriseEmpireManager.LoUAdapter).OnConnectionStateChange += LoUAdapter_OnConnectionStateChange;
     }
 
     /// <summary>
@@ -64,7 +66,7 @@ namespace EEM.Plugin.Ranking
     public void Dispose()
     {
       _enterpriseEmpireManager.RemoveMenuItem(EEMMenuItems.View, _myPluginViewMenuItem);
-      _enterpriseEmpireManager.LoUAdapter.OnConnectionStateChange -= LoUAdapter_OnConnectionStateChange;
+      ((LoUAdapter)_enterpriseEmpireManager.LoUAdapter).OnConnectionStateChange -= LoUAdapter_OnConnectionStateChange;
     }
 
     #endregion

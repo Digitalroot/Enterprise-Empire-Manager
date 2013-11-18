@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 using EEM.Common;
 using EEM.Common.Adapters;
-using EEM.Common.PluginInterface;
+using EEM.Common.Contracts;
 using EEM.Common.Protocol;
 using EEM.Plugin.Chat.Properties;
 using Net.Sgoliver.NRtfTree.Core;
@@ -439,17 +439,17 @@ namespace EEM.Plugin.Chat
 
     private void ChatScreenFormClosing(object sender, FormClosingEventArgs e)
     {
-      _loUAdapter.PollingService.OnPollItemRemoval -= PollingService_OnPollItemRemoval;
-      _loUAdapter.OnChatResponse -= loUAdapter_OnChatResponse;
-      _loUAdapter.OnConnectionStateChange -= loUAdapter_OnConnectionStateChange;
+      ((PollingService)_loUAdapter.PollingService).OnPollItemRemoval -= PollingService_OnPollItemRemoval;
+      ((LoUAdapter)_loUAdapter).OnChatResponse -= loUAdapter_OnChatResponse;
+      ((LoUAdapter)_loUAdapter).OnConnectionStateChange -= loUAdapter_OnConnectionStateChange;
       _loUAdapter.PollingService.RemovePollRequestItem(PollRequestItems.CHAT);
     }
 
     private void ChatScreenLoad(object sender, EventArgs e)
     {
-      _loUAdapter.OnChatResponse += loUAdapter_OnChatResponse;
-      _loUAdapter.OnConnectionStateChange += loUAdapter_OnConnectionStateChange;
-      _loUAdapter.PollingService.OnPollItemRemoval += PollingService_OnPollItemRemoval;
+      ((LoUAdapter)_loUAdapter).OnChatResponse += loUAdapter_OnChatResponse;
+      ((LoUAdapter)_loUAdapter).OnConnectionStateChange += loUAdapter_OnConnectionStateChange;
+      ((PollingService)_loUAdapter.PollingService).OnPollItemRemoval += PollingService_OnPollItemRemoval;
       HandleConnectionState(_loUAdapter.ConnectionState);
     }
 

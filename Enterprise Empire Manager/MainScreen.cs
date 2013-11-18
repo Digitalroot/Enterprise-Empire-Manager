@@ -3,7 +3,7 @@ using System.Net;
 using System.Windows.Forms;
 using EEM.Common;
 using EEM.Common.Adapters;
-using EEM.Common.PluginInterface;
+using EEM.Common.Contracts;
 using EEM.Properties;
 using Resources = EEM.Properties.Resources;
 
@@ -57,7 +57,7 @@ namespace EEM
         connectToolStripMenuItem_Click(null, null);
       }
 
-      LoUAdapter.OnCurrentCityChange += LoUAdapter_OnCurrentCityChange;
+      ((LoUAdapter)LoUAdapter).OnCurrentCityChange += LoUAdapter_OnCurrentCityChange;
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ namespace EEM
     /// Changes the name of the displayed city. 
     /// </summary>
     /// <param name="newCity"></param>
-    void LoUAdapter_OnCurrentCityChange(City newCity)
+    void LoUAdapter_OnCurrentCityChange(ICity newCity)
     {
       toolStripStatusLabelCurrentCityName.Text = newCity.Name;
     }

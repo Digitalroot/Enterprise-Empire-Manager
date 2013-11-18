@@ -2,8 +2,9 @@
 using System.Reflection;
 using System.Windows.Forms;
 using EEM.Common;
-using EEM.Common.PluginInterface;
+using EEM.Common.Contracts;
 using EEM.Plugin.Chat.Properties;
+using EEM.Plugins.Common.Contracts;
 using Resources = EEM.Plugin.Chat.Properties.Resources;
 
 namespace EEM.Plugin.Chat

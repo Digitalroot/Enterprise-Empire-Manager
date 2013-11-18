@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using EEM.Common.PluginInterface;
+using EEM.Common.Contracts;
 using EEM.Common.Protocol;
 
 namespace EEM.Plugin.Ranking
@@ -10,7 +10,7 @@ namespace EEM.Plugin.Ranking
   public partial class RankingScreen : Form
   {
     private IEnterpriseEmpireManager EnterpriseEmpireManager { get; set; }
-    private List<AllianceGetRangeResponse> AllianceGetRangeResponses { get; set; }
+    private List<IAllianceGetRangeResponse> AllianceGetRangeResponses { get; set; }
 
     public RankingScreen(IEnterpriseEmpireManager enterpriseEmpireManager)
     {
@@ -33,7 +33,7 @@ namespace EEM.Plugin.Ranking
 
     private bool CheckConnection()
     {
-      if (EnterpriseEmpireManager.LoUAdapter.ConnectionState == Common.ConnectionState.Disconnected)
+      if (EnterpriseEmpireManager.LoUAdapter.ConnectionState == ConnectionState.Disconnected)
       {
         MessageBox.Show("You must connect first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         return false;

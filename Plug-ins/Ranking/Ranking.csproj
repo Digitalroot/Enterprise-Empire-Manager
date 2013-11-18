@@ -133,6 +133,18 @@
       <Project>{64B0F378-6FDA-48CA-BDAD-4A5514CB19CF}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\EEM.Common.Contracts\EEM.Common.Contracts.csproj">
+      <Project>{A4564E46-1D62-4EF2-8F79-4728362D14E8}</Project>
+      <Name>EEM.Common.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EEM.Common\EEM.Common.csproj">
+      <Project>{EA36783D-885C-4336-97B8-186CA715662F}</Project>
+      <Name>EEM.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EEM.Plugins.Common.Contracts\EEM.Plugins.Common.Contracts.csproj">
+      <Project>{A2634626-BA0F-4E93-B6A1-0DEB2FDE17AA}</Project>
+      <Name>EEM.Plugins.Common.Contracts</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
