@@ -8,15 +8,15 @@ using System.Security.Authentication;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using EEM.Common.Clients;
+using EEM.Common.Adapters;
 using EEM.Common.Protocol;
 
-namespace EEM.Common.Adapters
+namespace EEM.Common.Clients
 {
   /// <summary>
   /// This is the piece that exchanges messages with the LoU Servers
   /// </summary>
-  public sealed class MessageExchangeAdapter
+  public sealed class MessageExchangeClient
   {
     /// <summary>
     /// Background worker thread.
@@ -26,7 +26,7 @@ namespace EEM.Common.Adapters
     /// <summary>
     /// Singleton Instance
     /// </summary>
-    private static volatile MessageExchangeAdapter _instance;
+    private static volatile MessageExchangeClient _instance;
 
     /// <summary>
     /// Stores commands to be executed.
@@ -56,7 +56,7 @@ namespace EEM.Common.Adapters
     /// <summary>
     /// Singleton
     /// </summary>
-    public static MessageExchangeAdapter Instance
+    public static MessageExchangeClient Instance
     {
       get
       {
@@ -65,7 +65,7 @@ namespace EEM.Common.Adapters
           lock (SyncRoot)
           {
             if (_instance == null)
-              _instance = new MessageExchangeAdapter();
+              _instance = new MessageExchangeClient();
           }
         }
         return _instance;
@@ -162,7 +162,7 @@ namespace EEM.Common.Adapters
     /// <summary>
     /// Constructor
     /// </summary>
-    private MessageExchangeAdapter()
+    private MessageExchangeClient()
       : this(null)
     { }
 
@@ -170,7 +170,7 @@ namespace EEM.Common.Adapters
     /// Constructor
     /// </summary>
     /// <param name="configuration"></param>
-    private MessageExchangeAdapter(AdapterConfiguration configuration)
+    private MessageExchangeClient(AdapterConfiguration configuration)
     {
       Configuration = configuration;
       _backgroundWorker.DoWork += BackgroundWorkerDoWork;
@@ -193,8 +193,12 @@ namespace EEM.Common.Adapters
       }
 
       var formData = new NameValueCollection();
-      formData["mail"] = credential.UserName;
-      formData["password"] = credential.Password;
+      formData["j_username"] = credential.UserName;
+      formData["j_password"] = credential.Password;
+      formData["spring-security-redirect"] = String.Empty;
+      formData["timezone"] = "-8";
+      formData["id="] = String.Empty;
+      formData["_web_remember_me"] = String.Empty;
 
       byte[] responseBytes = _webClient.UploadValues(Configuration.AuthenticationUrl, "POST", formData);
       RequestHeaders = _webClient.Headers;
@@ -247,7 +251,7 @@ namespace EEM.Common.Adapters
     /// <param name="htmlResult"></param>
     internal static void Debug(string method, string htmlResult)
     {
-      System.Diagnostics.Debug.WriteLine(String.Format("Connect: {0}, HtmlResult: {1}", method, htmlResult));
+      System.Diagnostics.Debug.WriteLine("Connect: {0}, HtmlResult: {1}", method, htmlResult);
     }
 
     /// <summary>
@@ -358,7 +362,7 @@ namespace EEM.Common.Adapters
     /// <returns></returns>
     internal string GetLogoutPage()
     {
-      var result = _webClient.QueryUrl(Configuration.LogoutURL);
+      var result = _webClient.QueryUrl(Configuration.LogoutUrl);
       ServerResponded(result);
       return result;
     }

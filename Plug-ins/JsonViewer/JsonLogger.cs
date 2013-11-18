@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using EEM.Common.Clients;
 using EEM.Common.PluginInterface;
 using EEM.Plugin.JsonLogger.Properties;
 
@@ -56,9 +57,9 @@ namespace EEM.Plugin.JsonLogger
     {
       _enterpriseEmpireManager = enterpriseEmpireManager;
 
-      Common.Adapters.MessageExchangeAdapter.Instance.OnServerRequest += LoUAdapter_OnServerRequest;
-      Common.Adapters.MessageExchangeAdapter.Instance.OnServerResponse += LoUAdapter_OnServerResponse;
-      Common.Adapters.MessageExchangeAdapter.Instance.OnServerResponseToQueuedCommand += LoUAdapter_OnServerResponseToQueuedCommand;
+      MessageExchangeClient.Instance.OnServerRequest += LoUAdapter_OnServerRequest;
+      MessageExchangeClient.Instance.OnServerResponse += LoUAdapter_OnServerResponse;
+      MessageExchangeClient.Instance.OnServerResponseToQueuedCommand += LoUAdapter_OnServerResponseToQueuedCommand;
 
       //_enterpriseEmpireManager.LoUAdapter.OnServerRequest += LoUAdapter_OnServerRequest;
       //_enterpriseEmpireManager.LoUAdapter.OnServerResponse += LoUAdapter_OnServerResponse;
@@ -70,9 +71,9 @@ namespace EEM.Plugin.JsonLogger
     /// </summary>
     public void Dispose()
     {
-      Common.Adapters.MessageExchangeAdapter.Instance.OnServerRequest -= LoUAdapter_OnServerRequest;
-      Common.Adapters.MessageExchangeAdapter.Instance.OnServerResponse -= LoUAdapter_OnServerResponse;
-      Common.Adapters.MessageExchangeAdapter.Instance.OnServerResponseToQueuedCommand -= LoUAdapter_OnServerResponseToQueuedCommand;
+      MessageExchangeClient.Instance.OnServerRequest -= LoUAdapter_OnServerRequest;
+      MessageExchangeClient.Instance.OnServerResponse -= LoUAdapter_OnServerResponse;
+      MessageExchangeClient.Instance.OnServerResponseToQueuedCommand -= LoUAdapter_OnServerResponseToQueuedCommand;
       //_enterpriseEmpireManager.LoUAdapter.OnServerRequest -= LoUAdapter_OnServerRequest;
       //_enterpriseEmpireManager.LoUAdapter.OnServerResponse -= LoUAdapter_OnServerResponse;
       //_enterpriseEmpireManager.LoUAdapter.OnServerResponseToQueuedCommand -= LoUAdapter_OnServerResponseToQueuedCommand;

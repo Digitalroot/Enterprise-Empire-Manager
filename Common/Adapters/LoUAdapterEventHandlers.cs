@@ -22,7 +22,7 @@ namespace EEM.Common.Adapters
     /// </summary>
     /// <param name="url"></param>
     /// <param name="json"></param>
-    void MessageExchangeAdapter_OnServerRequest(string url, JsonRequest json)
+    void MessageExchangeClientOnServerRequest(string url, JsonRequest json)
     {
       System.Diagnostics.Debug.WriteLine(String.Format("MessageExchangeClient.OnServerRequest: {0}, URL: {1}", json, url));
       ServerRequestMade(url, json);
@@ -32,7 +32,7 @@ namespace EEM.Common.Adapters
     /// OnServerResponse Event Handler
     /// </summary>
     /// <param name="result"></param>
-    void MessageExchangeAdapter_OnServerResponse(string result)
+    void MessageExchangeClientOnServerResponse(string result)
     {
       System.Diagnostics.Debug.WriteLine(String.Format("MessageExchangeClient.OnServerResponse: {0}", result));
       ServerResponded(result);
@@ -43,7 +43,7 @@ namespace EEM.Common.Adapters
     /// </summary>
     /// <param name="id"></param>
     /// <param name="result"></param>
-    void MessageExchangeAdapter_OnServerResponseToQueuedCommand(int id, string result)
+    void MessageExchangeClientOnServerResponseToQueuedCommand(int id, string result)
     {
       System.Diagnostics.Debug.WriteLine(String.Format("MessageExchangeClient.OnServerResponseToQueuedCommand, Id: {0}, Result: {1}", id, result));
 
@@ -110,7 +110,7 @@ namespace EEM.Common.Adapters
         json = PollingService.GetPollRequest(CurrentCity, SessionId, RequestCount);        
       }
 
-      var id = MessageExchangeAdapter.QueueServerCommand(ServerCommand.Poll, json);
+      var id = MessageExchangeClient.QueueServerCommand(ServerCommand.Poll, json);
       PollingService.ListOfPollIds.Add(id);
     }
 

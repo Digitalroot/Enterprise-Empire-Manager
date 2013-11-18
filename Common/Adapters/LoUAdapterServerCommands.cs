@@ -23,7 +23,7 @@ namespace EEM.Common.Adapters
         cityid = cityId
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.AbandonCity, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.AbandonCity, json);
       return result;
     }
 
@@ -43,7 +43,7 @@ namespace EEM.Common.Adapters
         queueid = queueId
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.CancelBuild, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.CancelBuild, json);
       return result;
     }
 
@@ -62,7 +62,7 @@ namespace EEM.Common.Adapters
         buildingid = buildingId
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.CreateMoonStone, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.CreateMoonStone, json);
       return result;
     }
 
@@ -81,7 +81,7 @@ namespace EEM.Common.Adapters
         buildingid = buildingId
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.DemolishBuilding, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.DemolishBuilding, json);
       return result;
     }
 
@@ -103,7 +103,7 @@ namespace EEM.Common.Adapters
         buildingType = ConversionUtil.ConvertBuildingType(buildingtype)
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.DowngradeBuilding, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.DowngradeBuilding, json);
       return result;
     }
 
@@ -122,7 +122,7 @@ namespace EEM.Common.Adapters
                                      buildingid = buildingId
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetBuildingInfo, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.GetBuildingInfo, json);
       return result;
     }
 
@@ -141,7 +141,7 @@ namespace EEM.Common.Adapters
                                      buildingPlace = buildingplace
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetBuildingUpgradeInfo, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.GetBuildingUpgradeInfo, json);
       return result;
     }
 
@@ -154,7 +154,7 @@ namespace EEM.Common.Adapters
         requests = String.Format("CITY:{0}\f", cityId)
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.Poll, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.Poll, json);
       var jsonArray = JsonConvert.DeserializeObject<ArrayList>(result);
       CityResponse cityResponse = null;
 
@@ -186,7 +186,7 @@ namespace EEM.Common.Adapters
                                      target = cityId
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetDistance, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.GetDistance, json);
       return JsonConvert.DeserializeObject<GetDistanceResponse>(result);
     }
 
@@ -203,7 +203,7 @@ namespace EEM.Common.Adapters
                                      requests = "REPORT:\f"
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.Poll, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.Poll, json);
       var jsonArray = JsonConvert.DeserializeObject<ArrayList>(result);
       var deserializedNewReportsJsonResponse = JsonConvert.DeserializeObject<PollResponse<NewReportsResponce>>(jsonArray[0].ToString());
       return deserializedNewReportsJsonResponse.D.NumberOfNewReports;
@@ -226,7 +226,7 @@ namespace EEM.Common.Adapters
                                      y = ycord
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetOrderTargetInfo, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.GetOrderTargetInfo, json);
       return JsonConvert.DeserializeObject<GetOrderTargetInfoResponse>(result);
     }
 
@@ -241,7 +241,7 @@ namespace EEM.Common.Adapters
                                      session = SessionId,
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetPlayerInfo, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.GetPlayerInfo, json);
       return JsonConvert.DeserializeObject<GetPlayerResponse>(result);
     }
 
@@ -258,7 +258,7 @@ namespace EEM.Common.Adapters
         id = cityId,
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetPublicCityInfo, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.GetPublicCityInfo, json);
       return JsonConvert.DeserializeObject<GetPublicCityInfoResponse>(result);      
     }
 
@@ -275,7 +275,7 @@ namespace EEM.Common.Adapters
         id = cityId,
       });
 
-      return MessageExchangeAdapter.QueueServerCommand(ServerCommand.GetPublicCityInfo, json);
+      return MessageExchangeClient.QueueServerCommand(ServerCommand.GetPublicCityInfo, json);
     }
 
     /// <summary>
@@ -291,7 +291,7 @@ namespace EEM.Common.Adapters
         id = playerId,
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetPublicPlayerInfo, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.GetPublicPlayerInfo, json);
       return JsonConvert.DeserializeObject<GetPublicPlayerInfoResponse>(result);
     }
 
@@ -310,7 +310,7 @@ namespace EEM.Common.Adapters
                                      city = cityid
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.ReportGetCount, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.ReportGetCount, json);
       return Int32.Parse(result);
     }
 
@@ -327,7 +327,7 @@ namespace EEM.Common.Adapters
                                      id = reportId
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetReport, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.GetReport, json);
       return JsonConvert.DeserializeObject<ReportDetails>(result);
     }
 
@@ -353,7 +353,7 @@ namespace EEM.Common.Adapters
                                      ascending = asc
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.ReportGetHeader, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.ReportGetHeader, json);
       return JsonConvert.DeserializeObject<List<ReportResponse>>(result);
     }
 
@@ -378,7 +378,7 @@ namespace EEM.Common.Adapters
                                      session = SessionId,
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetServerInfo, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.GetServerInfo, json);
       return JsonConvert.DeserializeObject<ServerInfoResponse>(result);
     }
 
@@ -395,7 +395,7 @@ namespace EEM.Common.Adapters
                                      cityid = cityId
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetUnitProductionInfo, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.GetUnitProductionInfo, json);
       return result;
     }
 
@@ -412,7 +412,7 @@ namespace EEM.Common.Adapters
         reset = true
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.OpenSession, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.OpenSession, json);
       return JsonConvert.DeserializeObject<OpenSessionResponse>(result); ;
     }
 
@@ -482,7 +482,7 @@ namespace EEM.Common.Adapters
         raidReferenceTimeUTCMillis = 0
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.OrderUnits, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.OrderUnits, json);
       return result;
     }
 
@@ -502,7 +502,7 @@ namespace EEM.Common.Adapters
                                      name = newName
                                    });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.RenameCity, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.RenameCity, json);
       return result == "true";
     }
 
@@ -520,7 +520,7 @@ namespace EEM.Common.Adapters
                                      requests = String.Format("CHAT:{0}\f", message)
                                    });
 
-      PollingService.ListOfPollIds.Add(MessageExchangeAdapter.QueueServerCommand(ServerCommand.Poll, json));
+      PollingService.ListOfPollIds.Add(MessageExchangeClient.QueueServerCommand(ServerCommand.Poll, json));
     }
 
     /// <summary>
@@ -540,7 +540,7 @@ namespace EEM.Common.Adapters
         body = bodytext
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.IGMSendMsg, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.IGMSendMsg, json);
       return result == "true";
     }
 
@@ -567,7 +567,7 @@ namespace EEM.Common.Adapters
         body = bodytext
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.IGMBulkSendMsg, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.IGMBulkSendMsg, json);
       return JsonConvert.DeserializeObject<List<string>>(result);
     }
 
@@ -580,7 +580,7 @@ namespace EEM.Common.Adapters
       });
 
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.GetPublicAllianceMemberList, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.GetPublicAllianceMemberList, json);
       return JsonConvert.DeserializeObject<List<GetPublicAllianceMemberListResponse>>(result);
     }
 
@@ -602,7 +602,7 @@ namespace EEM.Common.Adapters
                                        ascending = true
                                      });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.AllianceGetRange, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.AllianceGetRange, json);
       return JsonConvert.DeserializeObject<List<AllianceGetRangeResponse>>(result);
     }
 
@@ -614,7 +614,7 @@ namespace EEM.Common.Adapters
                                        sort = 0,
                                        ascending = true
                                      });
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.AllianceGetCountAndIndex, json); // [3126,0]
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.AllianceGetCountAndIndex, json); // [3126,0]
       result = result.TrimStart('[').TrimEnd(']');
       string[] split = result.Split(',');
 
@@ -631,7 +631,7 @@ namespace EEM.Common.Adapters
     public string SendRawJson(string rawInput, string url)
     {
       ErrorIfNotConnected();
-      return MessageExchangeAdapter.RawRequest(rawInput, url);
+      return MessageExchangeClient.RawRequest(rawInput, url);
     }
 
     /// <summary>
@@ -674,7 +674,7 @@ namespace EEM.Common.Adapters
         targetCity = toCityByXandYCords
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.TradeDirect, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.TradeDirect, json);
       return Int32.Parse(result);
     }
 
@@ -697,7 +697,7 @@ namespace EEM.Common.Adapters
         isPaid = ispaid
       });
 
-      var result = MessageExchangeAdapter.ExecuteServerCommand(ServerCommand.UpgradeBuilding, json);
+      var result = MessageExchangeClient.ExecuteServerCommand(ServerCommand.UpgradeBuilding, json);
       return result;
     }
   }

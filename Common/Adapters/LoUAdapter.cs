@@ -6,6 +6,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Windows.Forms;
+using EEM.Common.Clients;
 using EEM.Common.Exceptions;
 using EEM.Common.Protocol;
 using Newtonsoft.Json;
@@ -48,22 +49,23 @@ namespace EEM.Common.Adapters
       PollingService = new PollingService(TimeService);
       ConnectionState = ConnectionState.Disconnected;
       Credentials = credentials;
-      MessageExchangeAdapter = MessageExchangeAdapter.Instance;
-      MessageExchangeAdapter.OnServerRequest += MessageExchangeAdapter_OnServerRequest;
-      MessageExchangeAdapter.OnServerResponse += MessageExchangeAdapter_OnServerResponse;
-      MessageExchangeAdapter.OnServerResponseToQueuedCommand += MessageExchangeAdapter_OnServerResponseToQueuedCommand;
+      MessageExchangeClient = MessageExchangeClient.Instance;
+      MessageExchangeClient.OnServerRequest += MessageExchangeClientOnServerRequest;
+      MessageExchangeClient.OnServerResponse += MessageExchangeClientOnServerResponse;
+      MessageExchangeClient.OnServerResponseToQueuedCommand += MessageExchangeClientOnServerResponseToQueuedCommand;
       OnPlayerResponse += LoUAdapter_OnPlayerResponse;
       OnSystemResponse += LoUAdapter_OnSystemResponse;
 
       Configuration = loUAdapterConfiguration;
 
       Debug.WriteLine("Configuration:");
-      Debug.WriteLine("AuthenticationUrl = {0}", loUAdapterConfiguration.AuthenticationUrl);
-      Debug.WriteLine("GameServerUrl = {0}", loUAdapterConfiguration.GameServerUrl);
-      Debug.WriteLine("HomePageUrl = {0}", loUAdapterConfiguration.HomePageUrl);
-      Debug.WriteLine("SessionUrl = {0}", loUAdapterConfiguration.SessionUrl);
-      Debug.WriteLine("email = {0}", credentials.UserName);
-      Debug.WriteLine("pass = {0}", credentials.Password);
+      Debug.WriteLine(String.Format("AuthenticationUrl = {0}", loUAdapterConfiguration.AuthenticationUrl));
+      Debug.WriteLine(String.Format("GameServerUrl = {0}", loUAdapterConfiguration.GameServerUrl));
+      Debug.WriteLine(String.Format("HomePageUrl = {0}", loUAdapterConfiguration.HomePageUrl));
+      Debug.WriteLine(String.Format("SessionUrl = {0}", loUAdapterConfiguration.SessionUrl));
+      Debug.WriteLine(String.Format("email = {0}", credentials.UserName));
+      Debug.WriteLine(String.Format("pass = {0}", credentials.Password));
+
 
       PollingService.Polltimer.Tick += polltimer_Tick;
 
@@ -83,7 +85,7 @@ namespace EEM.Common.Adapters
     /// <summary>
     ///   Adapter used to pass commands to the LoU servers.
     /// </summary>
-    internal readonly MessageExchangeAdapter MessageExchangeAdapter;
+    internal readonly MessageExchangeClient MessageExchangeClient;
 
     private readonly LoUAdapterDB _loUAdapterDb = new LoUAdapterDB();
     private readonly Hashtable _queuedCityLookupIds = new Hashtable();
@@ -111,12 +113,12 @@ namespace EEM.Common.Adapters
       set
       {
         _configuration = value;
-        MessageExchangeAdapter.Configuration = value;
+        MessageExchangeClient.Configuration = value;
         Debug.WriteLine("Configuration:");
-        Debug.WriteLine("AuthenticationUrl = {0}", value.AuthenticationUrl);
-        Debug.WriteLine("GameServerUrl = {0}", value.GameServerUrl);
-        Debug.WriteLine("HomePageUrl = {0}", value.HomePageUrl);
-        Debug.WriteLine("SessionUrl = {0}", value.SessionUrl);
+        Debug.WriteLine(String.Format("AuthenticationUrl = {0}", value.AuthenticationUrl));
+        Debug.WriteLine(String.Format("GameServerUrl = {0}", value.GameServerUrl));
+        Debug.WriteLine(String.Format("HomePageUrl = {0}", value.HomePageUrl));
+        Debug.WriteLine(String.Format("SessionUrl = {0}", value.SessionUrl));
       }
     }
 
@@ -229,37 +231,20 @@ namespace EEM.Common.Adapters
       }
 
       // Load LoU Home Page to get Cookies
-      string result = MessageExchangeAdapter.GetHomePage();
+      MessageExchangeClient.GetHomePage();
+      MessageExchangeClient.GetHomePage();
 
-      // Check if we find the session id in the home page. 
+      //login via the form with the username and password we have.
+      MessageExchangeClient.Authenticate(Credentials);
+
+      var result = MessageExchangeClient.GetSessionPage();
       SessionId = GetSessionId(result);
 
-      // If we didn't find the session id
-      if (String.IsNullOrEmpty(SessionId))
-      {
-        // then login via the form with the username and password we have.
-        result = MessageExchangeAdapter.Authenticate(Credentials);
-
-        // Find the session id in the result.
-        SessionId = GetSessionId(result);
-
-        // if we still don't have a session id we might have a login error. 
-        if (String.IsNullOrEmpty(SessionId))
-        {
-          ArrayList errorMessages = GetErrorMessages(result);
-          if (errorMessages.Count > 0)
-          {
-            OnAuthenticationFailed(errorMessages);
-          }
-        }
-      }
-
-      // Last try. To get the session id. 
-      if (String.IsNullOrEmpty(SessionId))
-      {
-        result = MessageExchangeAdapter.GetSessionPage();
-        SessionId = GetSessionId(result);
-      }
+//      ArrayList errorMessages = GetErrorMessages(result);
+//      if (errorMessages.Count > 0)
+//      {
+//        OnAuthenticationFailed(errorMessages);
+//      }
 
       // if we now have a session id.
       if (!String.IsNullOrEmpty(SessionId))
@@ -387,7 +372,7 @@ namespace EEM.Common.Adapters
     /// <returns></returns>
     private string GetGamePage()
     {
-      return MessageExchangeAdapter.GetGamePage(SessionId);
+      return MessageExchangeClient.GetGamePage(SessionId);
     }
 
     /// <summary>
@@ -396,7 +381,7 @@ namespace EEM.Common.Adapters
     /// <returns></returns>
     private string GetHomePage()
     {
-      return MessageExchangeAdapter.GetHomePage();
+      return MessageExchangeClient.GetHomePage();
     }
 
     /// <summary>
@@ -405,43 +390,12 @@ namespace EEM.Common.Adapters
     /// <returns>A Session Id</returns>
     private static string GetSessionId(string result)
     {
-      if (!result.Contains("index.aspx?sessionId=") && !result.Contains("SessionId = \"") &&
-          !result.Contains("<input type=\"hidden\" name=\"sessionId\" id=\"sessionId\" value=\""))
-      {
-        Debug.WriteLine("Unable to find (index.aspx?sessionId=) or (SessionId = \") in last HtmlResult.");
-        return null;
-      }
-
-      var reader = new StringReader(result);
-      string line;
       string sessionId = null;
-      while ((line = reader.ReadLine()) != null)
+      if (result.Contains("sessionId"))
       {
-        if (!line.Contains("?sessionId=") && !line.Contains("SessionId = \"") &&
-            !result.Contains("<input type=\"hidden\" name=\"sessionId\" id=\"sessionId\" value=\"")) continue;
-
-        if (line.Contains("?sessionId="))
-        {
-          sessionId = line.Substring(line.IndexOf("?sessionId=", StringComparison.Ordinal) + 11, 36);
-          Debug.WriteLine("Test: {0}, Session Id found in HTML. Line: {1}", "LoUCloent.GetSessionId", line);
-          break;
-        }
-
-        if (line.Contains("SessionId = \""))
-        {
-          sessionId = line.Substring(line.IndexOf("SessionId = \"", StringComparison.Ordinal) + 13, 36);
-          Debug.WriteLine("Test: {0}, Session Id found in HTML. Line: {1}", "LoUCloent.GetSessionId", line);
-          break;
-        }
-
-        if (line.Contains("<input type=\"hidden\" name=\"sessionId\" id=\"sessionId\" value=\""))
-        {
-          sessionId =
-            line.Substring(line.IndexOf("<input type=\"hidden\" name=\"sessionId\" id=\"sessionId\" value=\"", StringComparison.Ordinal) + 60, 36);
-          Debug.WriteLine("Test: {0}, Session Id found in HTML. Line: {1}", "LoUCloent.GetSessionId", line);
-          break;
-        }
+        sessionId = result.Substring(result.IndexOf("sessionId", StringComparison.Ordinal) + 18, 36);
       }
+
       return sessionId;
     }
 
@@ -545,7 +499,7 @@ namespace EEM.Common.Adapters
           CurrentCity = null;
         }
 
-        MessageExchangeAdapter.OnServerResponseToQueuedCommand += City_OnServerResponseToQueuedCommand;
+        MessageExchangeClient.OnServerResponseToQueuedCommand += City_OnServerResponseToQueuedCommand;
 
         // Queue city look up
         foreach (CityResponseToBeFixed city in cities)
@@ -599,7 +553,7 @@ namespace EEM.Common.Adapters
       if (_queuedCityLookupIds.Count == 0)
       {
         LoadingScreen.Hide();
-        MessageExchangeAdapter.OnServerResponseToQueuedCommand -= City_OnServerResponseToQueuedCommand;
+        MessageExchangeClient.OnServerResponseToQueuedCommand -= City_OnServerResponseToQueuedCommand;
       }
     }
 
@@ -611,8 +565,8 @@ namespace EEM.Common.Adapters
     public void SetCredentials(NetworkCredential credential)
     {
       Credentials = credential;
-      Debug.WriteLine("email = {0}", credential.UserName);
-      Debug.WriteLine("pass = {0}", credential.Password);
+      Debug.WriteLine(String.Format("email = {0}", credential.UserName));
+      Debug.WriteLine(String.Format("pass = {0}", credential.Password));
     }
   }
 }

@@ -10,12 +10,12 @@
     /// <summary>
     /// This is the URL of the LoU Home Page.
     /// </summary>
-    string HomePageUrl { get; set; }
+    string HomePageUrl { get; }
 
     /// <summary>
     /// This is the URL of the logout script.
     /// </summary>
-    string LogoutURL { get; }
+    string LogoutUrl { get; }
 
     /// <summary>
     /// This is the URL that is queried after 

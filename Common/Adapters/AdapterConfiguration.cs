@@ -2,36 +2,28 @@
 {
   public class AdapterConfiguration : IAdapterConfiguration
   {
+    public AdapterConfiguration()
+    {
+      HomePageUrl = "https://www.lordofultima.com/home";
+      AuthenticationUrl = "https://www.lordofultima.com/j_security_check";
+      SessionUrl = "http://www.lordofultima.com/game/launch/redirect";
+      LogoutUrl = "https://www.lordofultima.com/en/user/logout";
+    }
+
     /// <summary>
     /// This is the URL that is queried to log into LoU.
     /// </summary>
     public string AuthenticationUrl { get; private set; }
 
-    private string _homePageUrl;
-
     /// <summary>
     /// This is the URL of the LoU Home Page.
     /// </summary>
-    public string HomePageUrl
-    {
-      get { return _homePageUrl; }
-      set
-      {
-        if (!value.EndsWith("/"))
-        {
-          value += "/";
-        }
-        AuthenticationUrl = value.Replace("http:", "https:") + "user/login?destination=%40homepage%3F";
-        LogoutURL = value + "user/logout";
-        SessionUrl = value + "game";
-        _homePageUrl = value;
-      }
-    }
+    public string HomePageUrl { get; private set; }
 
     /// <summary>
     /// This is the URL of the logout script.
     /// </summary>
-    public string LogoutURL { get; private set; }
+    public string LogoutUrl { get; private set; }
 
     /// <summary>
     /// This is the URL that is queried after 

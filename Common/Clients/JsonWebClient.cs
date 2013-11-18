@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -24,7 +25,7 @@ namespace EEM.Common.Clients
     {
       _cookieFile = _cookiePath + Path.DirectorySeparatorChar + "JsonWebClient.dat";
       // Adds Headers to the WebClient used to Query the LoU Server.
-      Headers.Add("user-agent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.4 (KHTML, like Gecko) Chrome/5.0.375.125 Safari/533.4 EEM/1.0.0");
+      Headers.Add("user-agent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.4 (KHTML, like Gecko) Chrome/5.0.375.125 Safari/533.4 EEM/1.0.1");
       ServicePointManager.Expect100Continue = false; // Stops the web client from sending HTTP 100 requests.
 
       if (File.Exists(_cookieFile))
@@ -100,7 +101,9 @@ namespace EEM.Common.Clients
         if (stream != null)
         {
           var sr = new StreamReader(stream);
-          return sr.ReadToEnd().Trim();
+          var result = sr.ReadToEnd().Trim();
+          Debug(uri, result);
+          return result;
         }
       }
       return null;
@@ -125,12 +128,13 @@ namespace EEM.Common.Clients
       os.Write(bytes, 0, bytes.Length); //Push it out there
       os.Close();
       WebResponse resp = req.GetResponse();
-      if (resp == null) return null;
       Stream stream = resp.GetResponseStream();
       if (stream != null)
       {
         var sr = new StreamReader(stream);
-        return sr.ReadToEnd().Trim();
+        var result = sr.ReadToEnd().Trim();
+        Debug(uri, result);
+        return result;
       }
       return null;
     }
@@ -142,16 +146,14 @@ namespace EEM.Common.Clients
     /// <returns></returns>
     public string QueryUrl(string url)
     {
-      try
+      using (Stream stream = OpenRead(url))
       {
-        using (Stream stream = OpenRead(url))
+        if (stream != null)
         {
-          if (stream != null) return new StreamReader(stream).ReadToEnd();
+          var result = new StreamReader(stream).ReadToEnd();
+          Debug(url, result);
+          return result;
         }
-      }
-      catch (Exception)
-      {
-        throw;
       }
       return null;
     }
@@ -195,7 +197,9 @@ namespace EEM.Common.Clients
       Headers.Add("X-Qooxdoo-Response-Type", "application/json");
 
       byte[] responseBytes = UploadValues(url, "POST", formData);
-      return Decode(responseBytes);
+      var result = Decode(responseBytes);
+      Debug(url, result);
+      return result;
     }
 
     /// <summary>
@@ -260,7 +264,9 @@ namespace EEM.Common.Clients
         {
           using (var sr = new StreamReader(stream))
           {
-            return sr.ReadToEnd();
+            var result = sr.ReadToEnd();
+            Debug(url, result);
+            return result;
           }
         }
       }
@@ -278,9 +284,17 @@ namespace EEM.Common.Clients
     /// <param name="method"></param>
     /// <param name="label"></param>
     /// <param name="text"></param>
+    [Conditional("DEBUG")]
     private static void Debug(string method, string label, string text)
     {
-      //System.Diagnostics.Debug.WriteLine(String.Format("Method: {0}, {1}: {2}", method, label, text));
+      System.Diagnostics.Debug.WriteLine("Method: {0}, {1}: {2}", method, label, text);
+    }
+
+    [Conditional("DEBUG")]
+    private static void Debug(string url, string result)
+    {
+      System.Diagnostics.Debug.WriteLine(url);
+      System.Diagnostics.Debug.WriteLine(result);
     }
   }
 }

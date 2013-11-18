@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Enterprise Empire Manager", "Enterprise Empire Manager\Enterprise Empire Manager.csproj", "{A2D8FB85-73D0-4C62-9640-299F3BF545EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NRTFTree", "NRTFTree\NRTFTree.csproj", "{1CBC8BC2-6958-4FEF-8DC9-56834645FC31}"

@@ -38,7 +38,7 @@ namespace EEM
       var config = new AdapterConfiguration
       {
         GameServerUrl = Settings.Default.Server,
-        HomePageUrl = Settings.Default.LoUUrl,
+//        HomePageUrl = Settings.Default.LoUUrl,
       };
       _loUAdapter = Common.Adapters.LoUAdapter.Instance;
       _loUAdapter.OnConnectionStateChange += _loUAdapter_OnConnectionStateChange;
@@ -87,21 +87,18 @@ namespace EEM
           connectionIconStripStatusLabel.Image = Resources.icon_yellowdot;
           statusStrip.Refresh();
 
-          System.Diagnostics.Debug.WriteLine(String.Format("loUClient.ConnectionState = {0}",
-                                                           _loUAdapter.ConnectionState));
+          System.Diagnostics.Debug.WriteLine("loUClient.ConnectionState = {0}", _loUAdapter.ConnectionState);
 
           if (_loUAdapter.ConnectionState != ConnectionState.Connected)
           {
             _loUAdapter.Connect();
           }
-          System.Diagnostics.Debug.WriteLine(String.Format("loUClient.ConnectionState = {0}",
-                                                           _loUAdapter.ConnectionState));
+          System.Diagnostics.Debug.WriteLine("loUClient.ConnectionState = {0}", _loUAdapter.ConnectionState);
           break;
 
         case ConnectionState.Connected:
           _loUAdapter.Disconnect();
-          System.Diagnostics.Debug.WriteLine(String.Format("loUClient.ConnectionState = {0}",
-                                                           _loUAdapter.ConnectionState));
+          System.Diagnostics.Debug.WriteLine("loUClient.ConnectionState = {0}", _loUAdapter.ConnectionState);
           break;
       }
     }
@@ -220,7 +217,7 @@ namespace EEM
       var config = new AdapterConfiguration
                      {
                        GameServerUrl = Settings.Default.Server,
-                       HomePageUrl = Settings.Default.LoUUrl,
+//                       HomePageUrl = Settings.Default.LoUUrl,
                      };
 
       if (_loUAdapter.ConnectionState == ConnectionState.Connected)
