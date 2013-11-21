@@ -3,7 +3,7 @@
   Created:     10/14/2010 12:59 PM
   Name:        eem.build*
   Description: NAnt Build File for EEM
-  Author:      Digitalroot
+  Author:      Digitalroot 
 ============================================================= -->
 <project name="eem" default="Release">
   <target name="Setup" description="Setup Global Properties.">
