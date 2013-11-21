@@ -185,29 +185,13 @@
     <None Include="Resources\icon_greendot.gif" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{64B0F378-6FDA-48CA-BDAD-4A5514CB19CF}</Project>
-      <Name>Common</Name>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{46a5dee4-562d-4f53-912f-b3c6a570bf12}</Project>
+      <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EEM.Common.Contracts\EEM.Common.Contracts.csproj">
-      <Project>{A4564E46-1D62-4EF2-8F79-4728362D14E8}</Project>
-      <Name>EEM.Common.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EEM.Common\EEM.Common.csproj">
-      <Project>{EA36783D-885C-4336-97B8-186CA715662F}</Project>
-      <Name>EEM.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EEM.Core.Contracts\EEM.Core.Contracts.csproj">
-      <Project>{34BCCAF7-9FFD-4C87-94F1-0B7BD7CECC97}</Project>
-      <Name>EEM.Core.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EEM.Core\EEM.Core.csproj">
-      <Project>{2576A3CB-C8FC-448A-B7BE-C4A6167A144F}</Project>
-      <Name>EEM.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EEM.Plugins.Common.Contracts\EEM.Plugins.Common.Contracts.csproj">
-      <Project>{A2634626-BA0F-4E93-B6A1-0DEB2FDE17AA}</Project>
-      <Name>EEM.Plugins.Common.Contracts</Name>
+    <ProjectReference Include="..\EEM\EEM.csproj">
+      <Project>{c0794320-ecd6-4c80-8bf0-33e6ac8cca24}</Project>
+      <Name>EEM</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

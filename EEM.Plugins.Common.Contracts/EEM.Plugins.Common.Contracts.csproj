@@ -40,18 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\EEM.Common.Contracts\EEM.Common.Contracts.csproj">
-      <Project>{A4564E46-1D62-4EF2-8F79-4728362D14E8}</Project>
-      <Name>EEM.Common.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EEM.Core.Contracts\EEM.Core.Contracts.csproj">
-      <Project>{34BCCAF7-9FFD-4C87-94F1-0B7BD7CECC97}</Project>
-      <Name>EEM.Core.Contracts</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

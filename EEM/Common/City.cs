@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using EEM.Common.Contracts;
 using EEM.Common.Protocol;
+
 namespace EEM.Common
 {
   public class City : ICity

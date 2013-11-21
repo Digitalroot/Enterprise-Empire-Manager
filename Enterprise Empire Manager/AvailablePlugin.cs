@@ -1,4 +1,4 @@
-﻿using EEM.Plugins.Common.Contracts;
+﻿using EEM.Common.Contracts;
 
 namespace EEM
 {

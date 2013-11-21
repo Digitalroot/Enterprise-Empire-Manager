@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Windows.Forms;
-using Core.Common;
 using Core.Common.Contracts;
 using EEM.Common.Protocol;
 using Newtonsoft.Json;

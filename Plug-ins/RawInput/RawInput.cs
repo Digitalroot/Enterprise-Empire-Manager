@@ -2,7 +2,6 @@
 using System.Windows.Forms;
 using EEM.Common;
 using EEM.Common.Contracts;
-using EEM.Plugins.Common.Contracts;
 
 namespace EEM.Plugin.RawInput
 {

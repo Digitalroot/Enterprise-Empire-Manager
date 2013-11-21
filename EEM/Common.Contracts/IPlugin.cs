@@ -1,7 +1,6 @@
 using System.Windows.Forms;
-using EEM.Common.Contracts;
 
-namespace EEM.Plugins.Common.Contracts
+namespace EEM.Common.Contracts
 {
   public interface IPlugin
   {

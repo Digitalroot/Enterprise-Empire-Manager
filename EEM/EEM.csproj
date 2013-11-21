@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C0794320-ECD6-4C80-8BF0-33E6AC8CCA24}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EEM</RootNamespace>
+    <AssemblyName>EEM</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Externals\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.66.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Externals\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common.Contracts\ConnectionState.cs" />
+    <Compile Include="Common.Contracts\EEMMenuItems.cs" />
+    <Compile Include="Common.Contracts\IAdapterConfiguration.cs" />
+    <Compile Include="Common.Contracts\IAllianceGetRangeResponse.cs" />
+    <Compile Include="Common.Contracts\ICity.cs" />
+    <Compile Include="Common.Contracts\ICityResponseToBeFixed.cs" />
+    <Compile Include="Common.Contracts\IEnterpriseEmpireManager.cs" />
+    <Compile Include="Common.Contracts\IGetPublicAllianceMemberListResponse.cs" />
+    <Compile Include="Common.Contracts\IGetPublicCityInfoResponse.cs" />
+    <Compile Include="Common.Contracts\IGetPublicPlayerInfoResponse.cs" />
+    <Compile Include="Common.Contracts\ILoUAdapter.cs" />
+    <Compile Include="Common.Contracts\ILoUProtocol.cs" />
+    <Compile Include="Common.Contracts\IMessageExchangeClient.cs" />
+    <Compile Include="Common.Contracts\IMilitaryGrouping.cs" />
+    <Compile Include="Common.Contracts\IPlugin.cs" />
+    <Compile Include="Common.Contracts\IPollingService.cs" />
+    <Compile Include="Common.Contracts\IPollResponse.cs" />
+    <Compile Include="Common.Contracts\ITimeService.cs" />
+    <Compile Include="Common.Contracts\MilitaryUnits.cs" />
+    <Compile Include="Common.Contracts\PollRequestItems.cs" />
+    <Compile Include="Common\Adapters\AdapterConfiguration.cs" />
+    <Compile Include="Common\Adapters\dbAdapter.cs" />
+    <Compile Include="Common\Adapters\dbScripts.cs" />
+    <Compile Include="Common\Adapters\LoUAdapter.cs" />
+    <Compile Include="Common\Adapters\LoUAdapterDB.cs" />
+    <Compile Include="Common\Adapters\LoUAdapterEventHandlers.cs" />
+    <Compile Include="Common\Adapters\LoUAdapterEvents.cs" />
+    <Compile Include="Common\Adapters\LoUAdapterServerCommands.cs" />
+    <Compile Include="Common\Adapters\PollingService.cs" />
+    <Compile Include="Common\Adapters\QueuedCommand.cs" />
+    <Compile Include="Common\Adapters\QueuedResult.cs" />
+    <Compile Include="Common\Adapters\ServerCommand.cs" />
+    <Compile Include="Common\Adapters\TimeService.cs" />
+    <Compile Include="Common\AttackType.cs" />
+    <Compile Include="Common\Building.cs" />
+    <Compile Include="Common\BuildingType.cs" />
+    <Compile Include="Common\ChatTargets.cs" />
+    <Compile Include="Common\City.cs" />
+    <Compile Include="Common\Clients\MessageExchangeClient.cs" />
+    <Compile Include="Common\ConversionUtil.cs" />
+    <Compile Include="Common\Exceptions\NotConnected.cs" />
+    <Compile Include="Common\LoadingScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Common\LoadingScreen.Designer.cs">
+      <DependentUpon>LoadingScreen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Common\Mail.cs" />
+    <Compile Include="Common\MilitaryGrouping.cs" />
+    <Compile Include="Common\Player.cs" />
+    <Compile Include="Common\Poll.cs" />
+    <Compile Include="Common\Protocol\ALLATResponse.cs" />
+    <Compile Include="Common\Protocol\ALLATResponseD.cs" />
+    <Compile Include="Common\Protocol\AllianceAttack.cs" />
+    <Compile Include="Common\Protocol\AllianceGetRangeResponse.cs" />
+    <Compile Include="Common\Protocol\AllianceResponse.cs" />
+    <Compile Include="Common\Protocol\ChatResponse.cs" />
+    <Compile Include="Common\Protocol\ChatResponseD.cs" />
+    <Compile Include="Common\Protocol\CityResponse.cs" />
+    <Compile Include="Common\Protocol\CityResponseD.cs" />
+    <Compile Include="Common\Protocol\CityResponseToBeFixed.cs" />
+    <Compile Include="Common\Protocol\GetDistanceResponse.cs" />
+    <Compile Include="Common\Protocol\GetOrderTargetInfoResponse.cs" />
+    <Compile Include="Common\Protocol\GetPlayerResponse.cs" />
+    <Compile Include="Common\Protocol\GetPublicAllianceMemberListResponse.cs" />
+    <Compile Include="Common\Protocol\GetPublicCityInfoResponse.cs" />
+    <Compile Include="Common\Protocol\GetPublicPlayerInfoResponse.cs" />
+    <Compile Include="Common\Protocol\JsonResponce.cs" />
+    <Compile Include="Common\Protocol\NewReportsResponce.cs" />
+    <Compile Include="Common\Protocol\OpenSessionResponse.cs" />
+    <Compile Include="Common\Protocol\PlayerResponse.cs" />
+    <Compile Include="Common\Protocol\PlayerResponseD.cs" />
+    <Compile Include="Common\Protocol\PlayerResponseG.cs" />
+    <Compile Include="Common\Protocol\PlayerResponseM.cs" />
+    <Compile Include="Common\Protocol\PollResponse.cs" />
+    <Compile Include="Common\Protocol\ReportBonuses.cs" />
+    <Compile Include="Common\Protocol\ReportCities.cs" />
+    <Compile Include="Common\Protocol\ReportDetails.cs" />
+    <Compile Include="Common\Protocol\ReportHeader.cs" />
+    <Compile Include="Common\Protocol\ReportResources.cs" />
+    <Compile Include="Common\Protocol\ReportResponse.cs" />
+    <Compile Include="Common\Protocol\ReportUnits.cs" />
+    <Compile Include="Common\Protocol\ServerInfoResponse.cs" />
+    <Compile Include="Common\Protocol\SysResponse.cs" />
+    <Compile Include="Common\Protocol\TimeResponse.cs" />
+    <Compile Include="Common\Protocol\TimeResponseD.cs" />
+    <Compile Include="Common\Protocol\Units.cs" />
+    <Compile Include="Common\Protocol\VersionResponse.cs" />
+    <Compile Include="Common\ReportType.cs" />
+    <Compile Include="Common\Resources.cs" />
+    <Compile Include="Common\Servers.cs" />
+    <Compile Include="Common\Titles.cs" />
+    <Compile Include="Common\TradeResource.cs" />
+    <Compile Include="Common\TradeTransportType.cs" />
+    <Compile Include="Common\UnitOrders.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Core.Contracts\" />
+    <Folder Include="Core\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Common\LoadingScreen.resx">
+      <DependentUpon>LoadingScreen.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{46a5dee4-562d-4f53-912f-b3c6a570bf12}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
