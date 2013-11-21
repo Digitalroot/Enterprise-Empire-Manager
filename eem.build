@@ -1,25 +1,25 @@
 <?xml version="1.0"?>
-<!-- ============================================================ 
-  Created:     10/14/2010 12:59 PM                              
-  Name:        eem.build*    
-  Description: description
+<!-- ============================================================
+  Created:     10/14/2010 12:59 PM
+  Name:        eem.build*
+  Description: NAnt Build File for EEM
   Author:      Digitalroot
 ============================================================= -->
-<project name="eem" default="BetaRelease">
+<project name="eem" default="Release">
   <target name="Setup" description="Setup Global Properties.">
     <property name="dir.working" value="${directory::get-current-directory()}" />
     <property name="dir.project" value="${dir.working}\Enterprise Empire Manager" />
     <property name="dir.installer" value="${dir.working}\EEM_Installer\Release" />
   </target>
 
-  <target name="BetaRelease" depends="Setup">
+  <target name="Release" depends="Setup">
     <echo message="Building Beta Release" />
-    
-    <!-- Build x86 -->		
+
+    <!-- Build x86 -->
     <call target="Build_x86"/>
 
     <!-- Build x64 - Disabled for now -->
-    <call target="Build_x64"/>
+    <!-- call target="Build_x64"/ -->
 
     <!-- Build Extras -->
     <fail if="${not property::exists('dir.extras')}" message="Missing dir.extras value." />
@@ -28,7 +28,6 @@
         <include name="**/*" />
       </fileset>
     </zip>
-    
   </target>
 
   <target name="Build_x86">
@@ -44,7 +43,7 @@
     <!-- Build x86 MSI -->
     <echo message="Building x86 Installer" />
     <!-- exec program="C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" commandline='"EEM.sln" /build Release /project "EEM_Installer_x86"'/ -->
-    
+
     <zip zipfile="${dir.build}\..\..\Enterprise_Empire_Manager_${build.platform}.zip" verbose="True">
       <fileset basedir="${dir.build}"> <!-- ${dir.installer} -->
         <include name="**/*" />
@@ -67,7 +66,6 @@
     <!-- Build x64 MSI -->
     <echo message="Building x64 Installer" />
     <!-- exec program="C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\devenv.exe" commandline='"EEM.sln" /build Release /project "EEM_Installer_x64"'/ -->
-  
   </target>
 
   <target name="DoBuild" description="Builds EEM">
@@ -81,10 +79,12 @@
     <delete dir="${dir.plugins}" failonerror="False" />
     <call target="Copy.NRTFTree"/>
     <call target="Copy.Plugin.Chat"/>
+    <!-- 
     <call target="Copy.Plugin.Ranking"/>
     <call target="Copy.Plugin.RawInput"/>
     <call target="Copy.Plugin.Notifications"/>
     <call target="Copy.Plugin.JsonLogger"/>
+    -->
 
     <delete>
       <fileset basedir="${dir.build}">
@@ -113,8 +113,7 @@
     <property name="plugin.name" value="JsonViewer" />
     <call target="Copy.PluginToExtras"/>
   </target>
-  
-  
+
   <target name="Copy.NRTFTree" description="Copies the NRTFTree Project to the plug-in directory.">
     <fail if="${not property::exists('dir.build')}" message="Missing dir.build value." />
     <fail if="${not property::exists('dir.plugins')}" message="Missing dir.plugins value." />
@@ -126,9 +125,9 @@
       <fileset basedir="${dir.working}\NRTFTree\bin\${build.platform}\Release">
         <include name="**.dll" />
         <include name="**.config" />
-        <include name="**.txt" />				
+        <include name="**.txt" /
       </fileset>
-    </copy>		
+    </copy>
   </target>
 
   <target name="Copy.Plugin" description="Copies the plug-in's files to the plug-in directory.">
@@ -146,8 +145,8 @@
         <include name="EEM.Plugin.*.txt" />
         <include name="EEM.Plugin.*.xml" />
       </fileset>
-    </copy>	
-  </target>		
+    </copy>
+  </target>
 
   <target name="Copy.PluginToExtras" description="Copies the plug-in's files to the plug-in directory.">
     <fail if="${not property::exists('dir.build')}" message="Missing dir.build value." />
@@ -164,6 +163,6 @@
         <include name="EEM.Plugin.*.txt" />
         <include name="EEM.Plugin.*.xml" />
       </fileset>
-    </copy>	
-  </target>	
+    </copy>
+  </target>
 </project>
