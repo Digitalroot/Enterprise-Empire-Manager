@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
-using EEM.Common;
-using EEM.Common.PluginInterface;
+using EEM.Common.Adapters;
+using EEM.Common.Contracts;
+
 
 namespace EEM.Plugin.PluginTemplateWithScreen
 {
@@ -54,7 +55,7 @@ namespace EEM.Plugin.PluginTemplateWithScreen
     {
       _enterpriseEmpireManager = enterpriseEmpireManager;
       _enterpriseEmpireManager.AddMenuItem(EEMMenuItems.View, _myPluginViewMenuItem);
-      _enterpriseEmpireManager.LoUAdapter.OnConnectionStateChange += LoUAdapter_OnConnectionStateChange;
+      ((LoUAdapter)_enterpriseEmpireManager.LoUAdapter).OnConnectionStateChange += LoUAdapter_OnConnectionStateChange;
     }
 
     /// <summary>
@@ -63,7 +64,7 @@ namespace EEM.Plugin.PluginTemplateWithScreen
     public void Dispose()
     {
       _enterpriseEmpireManager.RemoveMenuItem(EEMMenuItems.View, _myPluginViewMenuItem);
-      _enterpriseEmpireManager.LoUAdapter.OnConnectionStateChange -= LoUAdapter_OnConnectionStateChange;
+      ((LoUAdapter)_enterpriseEmpireManager.LoUAdapter).OnConnectionStateChange -= LoUAdapter_OnConnectionStateChange;
     }
 
     #endregion

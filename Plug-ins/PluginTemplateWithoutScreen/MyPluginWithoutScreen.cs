@@ -1,6 +1,7 @@
 ﻿using System.Windows.Forms;
-using EEM.Common;
-using EEM.Common.PluginInterface;
+using EEM.Common.Adapters;
+using EEM.Common.Contracts;
+
 
 namespace EEM.Plugin.PluginTemplateWithoutScreen
 {
@@ -52,7 +53,7 @@ namespace EEM.Plugin.PluginTemplateWithoutScreen
     public void Initialize(IEnterpriseEmpireManager enterpriseEmpireManager)
     {
       _enterpriseEmpireManager = enterpriseEmpireManager;
-      _enterpriseEmpireManager.LoUAdapter.OnConnectionStateChange += LoUAdapter_OnConnectionStateChange;
+      ((LoUAdapter)_enterpriseEmpireManager.LoUAdapter).OnConnectionStateChange += LoUAdapter_OnConnectionStateChange;
     }
 
     /// <summary>
@@ -60,7 +61,7 @@ namespace EEM.Plugin.PluginTemplateWithoutScreen
     /// </summary>
     public void Dispose()
     {
-      _enterpriseEmpireManager.LoUAdapter.OnConnectionStateChange -= LoUAdapter_OnConnectionStateChange;
+      ((LoUAdapter)_enterpriseEmpireManager.LoUAdapter).OnConnectionStateChange -= LoUAdapter_OnConnectionStateChange;
     }
 
     #endregion

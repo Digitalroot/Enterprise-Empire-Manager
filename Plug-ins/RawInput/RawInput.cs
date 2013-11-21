@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Windows.Forms;
-using EEM.Common;
 using EEM.Common.Contracts;
 
 namespace EEM.Plugin.RawInput

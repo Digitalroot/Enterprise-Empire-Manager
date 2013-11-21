@@ -1,5 +1,5 @@
 ﻿using System.Windows.Forms;
-using EEM.Common.PluginInterface;
+using EEM.Common.Contracts;
 
 namespace EEM.Plugin.PluginTemplateWithScreen
 {
