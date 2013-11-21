@@ -125,7 +125,7 @@
       <fileset basedir="${dir.working}\NRTFTree\bin\${build.platform}\Release">
         <include name="**.dll" />
         <include name="**.config" />
-        <include name="**.txt" /
+        <include name="**.txt" />
       </fileset>
     </copy>
   </target>
